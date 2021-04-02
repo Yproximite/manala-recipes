@@ -1,0 +1,115 @@
+manala:
+    description: yProximite - Generic application with PHP and Node.js support
+    template: .manala.yaml.tmpl
+    sync:
+        - .manala.yaml.tmpl.dist
+
+system:
+    # @option {"label": "System version"}
+    # @schema {"enum": [10]}
+    version: ~
+    # @option {"label": "Hostname"}
+    # @schema {"type": "string", "format": "domain"}
+    hostname: ~
+    # @schema {"type": ["integer", "null"]}
+    memory: ~
+    # @schema {"type": ["integer", "null"]}
+    cpus: ~
+    # @schema {"type": ["string"], "pattern": "^[a-zA-Z]+/[a-zA-Z]+$"}
+    timezone: Etc/UTC
+    locales:
+        # @schema {"type": ["string"]}
+        default: C.UTF-8
+        # @schema {"items": {"type": "string"}}
+        codes: []
+    # @schema {
+    #     "additionalProperties": {"type": ["string", "integer"]},
+    #     "propertyNames": {"pattern": "^[A-Z_]+$"}
+    # }
+    env: {}
+    apt:
+        # @schema {"items": {"type": "string"}}
+        repositories: []
+        # @schema {"items": {"type": "string"}}
+        preferences: []
+        # @schema {"items": {"type": "string"}}
+        packages: []
+        # @schema {"items": {"type": "string"}}
+        holds: []
+    # @schema {"items": {"type": "object"}}
+    files: []
+    nginx:
+        # @schema {
+        #     "items": {"type": "object",
+        #         "additionalProperties": false,
+        #         "properties": {
+        #             "template": {"type": "string"},
+        #             "file": {"type": "string"},
+        #             "config": {"type": ["string", "array"]},
+        #             "content": {"type": "string"}
+        #         }
+        #     }
+        # }
+        configs: []
+    php:
+        # @option {"label": "Php version"}
+        # @schema {"enum": [null, "8.0", 7.4, 7.3, 7.2, 7.1, "7.0", 5.6]}
+        version: ~
+        # @schema {"items": {"type": "string"}}
+        extensions: []
+        # @schema {
+        #     "items": {"type": "object",
+        #         "additionalProperties": false,
+        #         "properties": {
+        #             "template": {"type": "string"},
+        #             "file": {"type": "string"},
+        #             "config": {"type": ["object", "string", "array"]}
+        #         }
+        #     }
+        # }
+        configs: []
+        composer:
+            # @schema {"enum": [null, 1]}
+            version: ~
+        blackfire:
+            agent:
+                # @schema {"type": ["string", "null"]}
+                config: ~
+            client:
+                # @schema {"type": ["string", "null"]}
+                config: ~
+    nodejs:
+        # @option {"label": "Nodejs version"}
+        # @schema {"enum": [null, 14, 12, 10, 8, 6]}
+        version: ~
+        # @schema {"items": {"type": "object"}}
+        packages: []
+    mariadb:
+        # @option {"label": "MariaDB version"}
+        # @schema {"enum": [null, 10.5, 10.4, 10.3, 10.2, 10.1, "10.0"]}
+        version: ~
+    postgresql:
+        # @option {"label": "PostgreSQL version"}
+        # @schema {"enum": [null, 14, 12, 11, 10, 9.6]}
+        version: ~
+    redis:
+        # @option {"label": "Redis version"}
+        # @schema {"enum": [null, "*"]}
+        version: ~
+        # @schema {"type": ["object", "array"]}
+        config: {}
+    influxdb:
+        # @option {"label": "InfluxDB version"}
+        # @schema {"enum": [null, "*"]}
+        version: ~
+        # @schema {"type": ["object", "array"]}
+        config: {}
+        # @schema {"items": {"type": "string"}}
+        databases: []
+        # @schema {"items": {"type": "object"}}
+        users: []
+        # @schema {"items": {"type": "object"}}
+        privileges: []
+    docker:
+        # @schema {"items": {"type": "object"}}
+        containers: []
