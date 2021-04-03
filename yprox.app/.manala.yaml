@@ -2,6 +2,7 @@ manala:
     description: yProximite - Generic application with PHP and Node.js support
     template: .manala.yaml.tmpl
     sync:
+        - .manala/ansible
         - .manala/docker
         - .manala/make
         - .manala/vagrant
@@ -82,15 +83,15 @@ system:
             agent:
                 config:
                     # @schema {"type": ["string", "null"]}
-                    server-id: ~
+                    server_id: ~
                     # @schema {"type": ["string", "null"]}
-                    server-token: ~
+                    server_token: ~
             client:
                 config:
                     # @schema {"type": ["string", "null"]}
-                    client-id: ~
+                    client_id: ~
                     # @schema {"type": ["string", "null"]}
-                    client-token: ~
+                    client_token: ~
     nodejs:
         # @option {"label": "Nodejs version"}
         # @schema {"enum": [null, 14, 12, 10, 8, 6]}
@@ -123,6 +124,10 @@ system:
         users: []
         # @schema {"items": {"type": "object"}}
         privileges: []
+    ssh:
+        client:
+            # @schema {"type": ["null", "string", "array"]}
+            config: ~
     docker:
         # @schema {"items": {"type": "object"}}
         containers: []
