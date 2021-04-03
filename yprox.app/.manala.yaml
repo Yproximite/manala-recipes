@@ -2,7 +2,11 @@ manala:
     description: yProximite - Generic application with PHP and Node.js support
     template: .manala.yaml.tmpl
     sync:
+        - .manala/make
+        - .manala/vagrant
+        - .manala/Makefile.tmpl
         - .manala.yaml.tmpl.dist
+        - Makefile.tmpl
 
 system:
     # @option {"label": "System version"}
