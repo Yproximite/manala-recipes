@@ -2,11 +2,14 @@ manala:
     description: yProximite - Generic application with PHP and Node.js support
     template: .manala.yaml.tmpl
     sync:
+        - .manala/docker
         - .manala/make
         - .manala/vagrant
         - .manala/Makefile.tmpl
+        - .manala/Vagrantfile.tmpl
         - .manala.yaml.tmpl.dist
         - Makefile.tmpl
+        - vagrant-wrapper.sh
 
 system:
     # @option {"label": "System version"}
@@ -16,9 +19,9 @@ system:
     # @schema {"type": "string", "format": "domain"}
     hostname: ~
     # @schema {"type": ["integer", "null"]}
-    memory: ~
+    memory: 2048
     # @schema {"type": ["integer", "null"]}
-    cpus: ~
+    cpus: 2
     # @schema {"type": ["string"], "pattern": "^[a-zA-Z]+/[a-zA-Z]+$"}
     timezone: Etc/UTC
     locales:
@@ -77,11 +80,17 @@ system:
             version: ~
         blackfire:
             agent:
-                # @schema {"type": ["string", "null"]}
-                config: ~
+                config:
+                    # @schema {"type": ["string", "null"]}
+                    server-id: ~
+                    # @schema {"type": ["string", "null"]}
+                    server-token: ~
             client:
-                # @schema {"type": ["string", "null"]}
-                config: ~
+                config:
+                    # @schema {"type": ["string", "null"]}
+                    client-id: ~
+                    # @schema {"type": ["string", "null"]}
+                    client-token: ~
     nodejs:
         # @option {"label": "Nodejs version"}
         # @schema {"enum": [null, 14, 12, 10, 8, 6]}
