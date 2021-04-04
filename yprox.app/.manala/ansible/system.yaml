@@ -105,6 +105,9 @@
           'default'
         }}"
         state: "{{ 'present' if (system_mariadb) else 'ignore' }}"
+      # PostgreSQL
+      - preference: postgresql@postgresql
+        state: "{{ 'present' if (system_postgresql) else 'ignore' }}"
       # Redis
       - preference: redis@backports
         state: "{{ 'present' if (
@@ -133,7 +136,7 @@
     manala_docker_containers:
       - name: phpmyadmin
         image: phpmyadmin/phpmyadmin
-        state: "{{ 'started' if (system_mysql or system_mariadb) else 'absent' }}"
+        state: "{{ 'started' if (system_mariadb) else 'absent' }}"
         restart_policy: unless-stopped
         env:
           PMA_USER: root
