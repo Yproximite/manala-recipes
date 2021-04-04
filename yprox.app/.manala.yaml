@@ -6,6 +6,7 @@ manala:
         - .manala/docker
         - .manala/make
         - .manala/vagrant
+        - .manala/.gitignore
         - .manala/Makefile.tmpl
         - .manala/Vagrantfile.tmpl
         - .manala.yaml.tmpl.dist
