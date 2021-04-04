@@ -235,17 +235,6 @@
 
     manala_influxdb_privileges: "{{ system_influxdb_privileges }}"
 
-    ########
-    # Java #
-    ########
-
-    manala_java_version: "{{ {
-        'jessie': '8',
-        'stretch': '8',
-        'buster': '11',
-      }[ansible_distribution_release]
-    }}"
-
     ###########
     # Locales #
     ###########
@@ -526,11 +515,6 @@
         name: postgresql
       when: system_postgresql
       tags: [postgresql]
-
-    - import_role:
-        name: java
-      when: system_java
-      tags: [java]
 
     - import_role:
         name: docker
