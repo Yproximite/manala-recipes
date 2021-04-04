@@ -1,0 +1,118 @@
+{{- with .Vars.system -}}
+
+####################################################################
+# !!! REMINDER !!!                                                 #
+# Don't forget to run `manala up` each time you update this file ! #
+####################################################################
+
+manala:
+    recipe: yprox.app
+
+##########
+# System #
+##########
+
+system:
+    version: {{ .version | toYaml }}
+    hostname: {{ .hostname | toYaml }}
+    nginx:
+        configs:
+          - template: nginx/gzip.j2
+          {{- if .php.version }}
+          - template: nginx/php_fpm_app.j2
+          {{- end }}
+          # App
+          - file: app.conf
+            config: |
+                server {
+                    listen 443 ssl;
+                    listen 4430 ssl;
+                    listen 4431 ssl;
+
+                    server_name ~.;
+                    root /srv/app/public;
+
+                    ssl_certificate /srv/app/var/{{ .hostname | toYaml }}+1.pem;
+                    ssl_certificate_key /srv/app/var/{{ .hostname | toYaml }}+1-key.pem;
+
+                    access_log /srv/log/nginx.access.log;
+                    error_log /srv/log/nginx.error.log;
+
+                    include conf.d/gzip;
+                {{- if .php.version }}
+                    location / {
+                        try_files $uri /index.php$is_args$args;
+                    }
+                    location ~ ^/index\.php(/|$) {
+                        include conf.d/php_fpm_app;
+                        set $APP_ENV dev;
+                        if ( $server_port = 4430 ) {
+                            set $APP_ENV test;
+                        }
+                        if ( $server_port = 4431 ) {
+                            set $APP_ENV prod;
+                        }
+                        fastcgi_param APP_ENV $APP_ENV;
+                        internal;
+                    }
+                {{- end }}
+                }
+    {{- if .php.version }}
+    php:
+        version: {{ .php.version | toYaml }}
+        extensions:
+          # Symfony
+          - intl
+          - curl
+          - mbstring
+          - xml
+          # App
+          {{- if (not (empty .mariadb.version)) }}
+          - mysql
+          {{- end }}
+          {{- if (not (empty .postgresql.version)) }}
+          - pgsql
+          {{- end }}
+        configs:
+          - template: php/opcache.ini.j2
+          - template: php/app.ini.j2
+            config:
+              date.timezone: UTC
+    {{- end }}
+
+    {{- if .nodejs.version }}
+    nodejs:
+        version: {{ .nodejs.version | toYaml }}
+    {{- end }}
+
+    {{- if .mariadb.version }}
+    mariadb:
+        version: {{ .mariadb.version | toYaml }}
+    {{- end }}
+
+    {{- if .postgresql.version }}
+    postgresql:
+        version: {{ .postgresql.version | toYaml }}
+    {{- end }}
+
+    {{- if .redis.version }}
+    redis:
+        version: {{ .redis.version | toYaml }}
+    {{- end }}
+
+    {{- if .influxdb.version }}
+    influxdb:
+        version: {{ .influxdb.version | toYaml }}
+    {{- end }}
+
+    files:
+      - path: /srv/app/var/log
+        src: /srv/log
+        state: link_directory
+        force: true
+      - path: /srv/app/var/cache
+        src: /srv/cache
+        state: link_directory
+        force: true
+
+{{- end }}

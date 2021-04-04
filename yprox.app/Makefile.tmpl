@@ -1,0 +1,55 @@
+{{- with .Vars.system -}}
+.SILENT:
+
+-include .manala/Makefile
+
+define setup_before
+	(cd var; mkcert '{{ .hostname | toYaml }}' '*.{{ .hostname | toYaml }}')
+endef
+
+define setup
+	$(VAGRANT_MAKE) install-app
+endef
+
+###########
+# Install #
+###########
+
+## Install application
+install-app: composer-install init-db
+install-app:
+	bin/console cache:clear
+	yarn install
+	yarn dev
+
+install-app@test: export APP_ENV=test
+install-app@test: install-app
+
+################
+# Common tasks #
+################
+
+composer-install:
+	composer install --verbose --no-interaction
+
+init-db:
+	bin/console doctrine:database:drop --force --if-exists --no-interaction
+	bin/console doctrine:database:create --no-interaction
+	bin/console doctrine:schema:update --force --no-interaction # to remove when we will use migrations
+	# bin/console doctrine:migrations:migrate --no-interaction
+	bin/console hautelook:fixtures:load --no-interaction
+
+init-db@test: export APP_ENV=test
+init-db@test: init-db
+
+init-db@ci:
+	# MariaDB only: create the database before using it. The database already exists when using PostgreSQL service
+	bin/console doctrine:database:create --no-interaction
+	bin/console doctrine:schema:update --force --no-interaction # to remove when we will use migrations
+	# bin/console doctrine:migrations:migrate --no-interaction
+	bin/console hautelook:fixtures:load --no-interaction
+
+reload-db@test:
+	APP_ENV=test bin/console hautelook:fixtures:load --purge-with-truncate --no-interaction
+
+{{- end }}
