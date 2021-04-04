@@ -283,9 +283,11 @@
     ##############
 
     manala_postgresql_version: "{{ system_postgresql_version }}"
+    manala_postgresql_config_template: config/default.dev.j2
+    manala_postgresql_config_hba_template: config/hba/default.dev.j2
     manala_postgresql_roles:
-      - role:       "{{ system_app_user }}"
-        password:   ~
+      - role: app
+        password: ~
         attributes: ['SUPERUSER']
 
     #########
