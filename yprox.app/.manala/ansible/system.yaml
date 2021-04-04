@@ -283,6 +283,10 @@
     ##############
 
     manala_postgresql_version: "{{ system_postgresql_version }}"
+    manala_postgresql_roles:
+      - role:       "{{ system_app_user }}"
+        password:   ~
+        attributes: ['SUPERUSER']
 
     #########
     # Nginx #
