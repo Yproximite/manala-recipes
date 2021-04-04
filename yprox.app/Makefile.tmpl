@@ -3,8 +3,11 @@
 
 -include .manala/Makefile
 
-define setup
+define setup_before
 	(cd var; mkcert '{{ .hostname | toYaml }}' '*.{{ .hostname | toYaml }}')
+endef
+
+define setup
 	$(VAGRANT_MAKE) install-app
 endef
 

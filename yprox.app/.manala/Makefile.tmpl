@@ -27,6 +27,7 @@ HELP += $(call help_section, Environment)
 ifdef _ROOT
 HELP += $(call help,setup,               Setup environment)
 setup:
+	$(setup_before)
 	vagrant up --provision
 	$(setup)
 endif
