@@ -7,7 +7,7 @@ vagrant_wrapper() {
 
     # we assume that we are outside the VM if command `vagrant` is available
     if [[ -x "$(command -v vagrant)" ]]; then
-        make ssh "cd /srv/app && ${user_command}"
+        (cd ".manala" && vagrant ssh -- "cd /srv/app && ${user_command}")
     else
         (cd "${DIR}" && eval ${user_command})
     fi
