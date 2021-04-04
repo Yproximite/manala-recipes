@@ -25,9 +25,9 @@ system:
           - file: app.conf
             config: |
                 server {
-                    listen 443;
-                    listen 4430;
-                    listen 4431;
+                    listen 443 ssl;
+                    listen 4430 ssl;
+                    listen 4431 ssl;
 
                     server_name ~.;
                     root /srv/app/public;
