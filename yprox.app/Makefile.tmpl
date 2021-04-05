@@ -31,6 +31,7 @@ install-app@integration:
 	composer install --ansi --verbose --no-interaction --no-progress --prefer-dist --optimize-autoloader
 	# Yarn
 	yarn install --color=always --no-progress --frozen-lockfile
+	yarn dev
 
 	$(MAKE) init-db@integration
 
