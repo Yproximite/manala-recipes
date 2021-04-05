@@ -9,6 +9,7 @@ manala:
         - .manala/vagrant
         - .manala/.dockerignore
         - .manala/.gitignore
+        - .manala/DO_NOT_MANUALLY_EDIT
         - .manala/Dockerfile.tmpl
         - .manala/Makefile.tmpl
         - .manala/Vagrantfile.tmpl
