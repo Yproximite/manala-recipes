@@ -10,10 +10,11 @@ services:
         GID: ${MANALA_CI_GID}
     network_mode: 'host'
     command: 'tail -f /dev/null'
+    env_file:
+       - ./.env
     environment:
       XDG_CACHE_HOME: '/docker/.cache/docker'
       SSH_AUTH_SOCK: ${SSH_AUTH_SOCK:-/ssh-agent}
-      COMPOSER_AUTH: ${COMPOSER_AUTH}
     volumes:
       - type: bind
         consistency: cached
@@ -33,7 +34,6 @@ services:
   postgres:
     image: 'postgres:{{ $postgresql.version }}'
     network_mode: 'host'
-    command: '--port=5432'
     environment:
       POSTGRES_USER: 'app'
       POSTGRES_PASSWORD: 'app'
