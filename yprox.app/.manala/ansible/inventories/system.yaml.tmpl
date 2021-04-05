@@ -182,4 +182,49 @@ system:
             system_vim: true
             # Zsh
             system_zsh: true
+
+        ###############
+        # Integration #
+        ###############
+
+        integration:
+
+            # App
+            system_app: true
+            system_app_group: docker
+            system_app_user: docker
+            # Apt
+            system_apt: true
+            system_apt_packages:
+                - xz-utils
+                - rsync
+                - wget
+                - curl
+                - make
+                - less
+                - ssl-cert
+                - procps
+                - vim-tiny
+            {{- if .apt.packages }}
+                # App
+                {{- .apt.packages | toYaml | nindent 16 }}
+            {{- end }}
+            # Git
+            system_git: true
+            # Locales
+            system_locales: true
+            # NodeJS
+            system_nodejs: {{ not (empty .nodejs.version) | ternary "true" "false" }}
+            # Php
+            system_php: {{ not (empty .php.version) | ternary "true" "false" }}
+            system_php_sapis:
+              - cli
+            # Ssh
+            system_ssh: true
+            system_ssh_client_config_template: {{ `"{{
+              'ssh/integration/ssh_config.j2'
+                if (system_ssh_client_config is string) else
+              'config/client/default.test.j2'
+            }}"` }}
+
 {{- end }}
