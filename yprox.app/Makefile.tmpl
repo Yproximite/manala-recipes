@@ -42,9 +42,8 @@ init-db:
 init-db@test: export APP_ENV=test
 init-db@test: init-db
 
-init-db@ci:
-	# MariaDB only: create the database before using it. The database already exists when using PostgreSQL service
-	{{ if .postgresql.version }}#{{ end }}bin/console doctrine:database:create --no-interaction
+init-db@integration:
+	bin/console doctrine:database:create --no-interaction
 	bin/console doctrine:schema:update --force --no-interaction # to remove when we will use migrations
 	# bin/console doctrine:migrations:migrate --no-interaction
 	bin/console hautelook:fixtures:load --no-interaction
