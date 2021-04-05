@@ -1,0 +1,57 @@
+version: '3.8'
+services:
+
+  manala_ci:
+    image: manala_ci
+    build:
+      context: ../
+      args:
+        UID: ${MANALA_CI_UID}
+        GID: ${MANALA_CI_GID}
+    network_mode: 'host'
+    command: 'tail -f /dev/null'
+    environment:
+      XDG_CACHE_HOME: '/docker/.cache/docker'
+      SSH_AUTH_SOCK: ${SSH_AUTH_SOCK:-/ssh-agent}
+    volumes:
+      - type: bind
+        consistency: cached
+        source: ${GITHUB_WORKSPACE}
+        target: /srv/app
+      - type: bind
+        consistency: delegated
+        source: ${GITHUB_WORKSPACE}/.manala
+        target: /docker
+      - type: bind
+        source: ${SSH_AUTH_SOCK:-/home/runner/ssh-agent}
+        target: ${SSH_AUTH_SOCK:-/ssh-agent}
+
+{{- if .Vars.system.postgresql.version -}}
+{{- $postgresql := .Vars.system.postgresql }}
+
+  postgres:
+    image: 'postgres:{{ $postgresql.version }}'
+    network_mode: 'host'
+    command: '--port=5432'
+    environment:
+      POSTGRES_USER: 'app'
+      POSTGRES_PASSWORD: 'app'
+{{- end }}
+
+{{- if .Vars.system.mariadb.version -}}
+{{- $mariadb := .Vars.system.mariadb }}
+
+  mariadb:
+    image: 'mariadb:{{ $mariadb.version }}'
+    network_mode: 'host'
+    command: '--port=3306'
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+{{- end }}
+
+{{- if .Vars.system.redis.version }}
+
+  redis:
+    image: 'redis'
+    network_mode: 'host'
+{{- end }}
