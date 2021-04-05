@@ -25,6 +25,15 @@ install-app:
 install-app@test: export APP_ENV=test
 install-app@test: install-app
 
+install-app@integration: export APP_ENV=test
+install-app@integration:
+	# Composer
+	composer install --ansi --verbose --no-interaction --no-progress --prefer-dist --optimize-autoloader
+	# Yarn
+	yarn install --color=always --no-progress --frozen-lockfile
+
+	$(MAKE) init-db@integration
+
 ################
 # Common tasks #
 ################
@@ -42,8 +51,7 @@ init-db:
 init-db@test: export APP_ENV=test
 init-db@test: init-db
 
-init-db@ci:
-	# MariaDB only: create the database before using it. The database already exists when using PostgreSQL service
+init-db@integration:
 	bin/console doctrine:database:create --no-interaction
 	bin/console doctrine:schema:update --force --no-interaction # to remove when we will use migrations
 	# bin/console doctrine:migrations:migrate --no-interaction

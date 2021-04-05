@@ -4,9 +4,12 @@ manala:
     sync:
         - .manala/ansible
         - .manala/docker
+        - .manala/github
         - .manala/make
         - .manala/vagrant
+        - .manala/.dockerignore
         - .manala/.gitignore
+        - .manala/Dockerfile.tmpl
         - .manala/Makefile.tmpl
         - .manala/Vagrantfile.tmpl
         - .manala.yaml.tmpl.dist
