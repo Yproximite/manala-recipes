@@ -13,6 +13,7 @@ services:
     environment:
       XDG_CACHE_HOME: '/docker/.cache/docker'
       SSH_AUTH_SOCK: ${SSH_AUTH_SOCK:-/ssh-agent}
+      COMPOSER_AUTH: ${COMPOSER_AUTH}
     volumes:
       - type: bind
         consistency: cached
