@@ -71,6 +71,8 @@ COPY ansible/inventories/system.yaml         /tmp/ansible/inventories/
 COPY ansible/templates                       /tmp/ansible/templates/
 COPY ansible/ansible.cfg ansible/system.yaml /tmp/ansible/
 
+COPY --from=symfonycorp/cli /symfony /usr/local/bin/symfony
+
 RUN \
     cd /tmp/ansible \
     && ansible-galaxy collection install \
