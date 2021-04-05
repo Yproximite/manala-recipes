@@ -25,6 +25,15 @@ install-app:
 install-app@test: export APP_ENV=test
 install-app@test: install-app
 
+install-app@integration: export APP_ENV=test
+install-app@integration:
+	# Composer
+	composer install --ansi --verbose --no-interaction --no-progress --prefer-dist --optimize-autoloader
+	# Yarn
+	yarn install --color=always --no-progress --frozen-lockfile
+
+	$(MAKE) init-db@integration
+
 ################
 # Common tasks #
 ################
