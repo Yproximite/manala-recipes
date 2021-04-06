@@ -544,3 +544,15 @@
         name: ngrok
       when: system_ngrok
       tags: [ngrok]
+
+    - name: "scalingo cli > download"
+      when: system_scalingo
+      tags: [scalingo]
+      get_url:
+        url: https://cli-dl.scalingo.io/install
+        dest: /tmp/scalingo-cli-install
+
+    - name: "scalingo cli > install"
+      when: system_scalingo
+      tags: [scalingo]
+      command: bash /tmp/scalingo-cli-install --yes

@@ -93,6 +93,8 @@ system:
         system_redis: false
         system_redis_version: {{ .redis.version | toYaml }}
         {{- dict "system_redis_server_config" .redis.config | toYaml | nindent 8 }}
+        # Scalingo
+        system_scalingo: {{ .scalingo | ternary "true" "false" }}
         # Ssh
         system_ssh: false
         system_ssh_server: false
