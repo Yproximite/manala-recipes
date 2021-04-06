@@ -9,6 +9,7 @@ services:
         UID: ${MANALA_CI_UID}
         GID: ${MANALA_CI_GID}
     network_mode: 'host'
+    ipc: 'host' # Prevent Cypress/Chrome to crash, see https://github.com/cypress-io/cypress/issues/350
     command: 'tail -f /dev/null'
     env_file:
        - ./.env
