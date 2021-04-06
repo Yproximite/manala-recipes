@@ -31,7 +31,7 @@ This recipe contains some helpful scripts in the context of a php/nodejs app, su
 
 ```
 $ cd [workspace]
-$ manala init -i yprox.app --repository https://github.com/Yproximite/manala-recipes [project]
+$ manala init -i yprox.app --repository https://github.com/Yproximite/manala-recipes.git [project]
 ```
 
 ## Quick start
@@ -40,7 +40,7 @@ In a shell terminal, change directory to your app, and run the following command
 
 ```shell
 cd /path/to/my/app
-manala init --repository https://github.com/Yproximite/manala-recipes
+manala init --repository https://github.com/Yproximite/manala-recipes.git
 Select the "yprox.app" recipe
 ```
 
