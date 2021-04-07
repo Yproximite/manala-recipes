@@ -28,6 +28,8 @@ services:
       - type: bind
         source: ${SSH_AUTH_SOCK:-/home/runner/ssh-agent}
         target: ${SSH_AUTH_SOCK:-/ssh-agent}
+      - type: tmpfs
+        target: /dev/shm
 
 {{- if .Vars.system.postgresql.version -}}
 {{- $postgresql := .Vars.system.postgresql }}
