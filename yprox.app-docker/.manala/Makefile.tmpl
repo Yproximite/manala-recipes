@@ -20,27 +20,40 @@ symfony := symfony
 php := $(symfony) php
 composer := $(symfony) composer
 
-HELP += $(call help,setup,  Setup the development environment)
+HELP += $(call help,setup,             Setup the development environment)
 setup: setup-symfony build-docker
 	$(dc) up --detach
 	$(setup)
+
+HELP += $(call help,setup@integration, Setup the integration environment)
+setup@integration: export APP_ENV=test
+setup@integration: setup-symfony@integration build-docker
+	$(dc) up --detach
+	$(setup_integration)
 
 setup-symfony:
 	$(symfony) server:ca:install
 	$(symfony) proxy:start
 	$(symfony) proxy:domain:attach {{ .Vars.system.app_name }}
 
+setup-symfony@integration:
+	$(symfony) server:ca:install
+
 build-docker:
+	mkdir -p $(_ROOT_DIR)/.manala/.docker/db-data
+	mkdir -p $(_ROOT_DIR)/.manala/.docker/db-data-test
+	mkdir -p $(_ROOT_DIR)/.manala/.docker/redis-data
+	mkdir -p $(_ROOT_DIR)/.manala/.docker/redis-data-test
 	$(dc) pull && $(dc) build
 
-HELP += $(call help,up,  Start the development environment)
+HELP += $(call help,up,                Start the development environment)
 up:
 	$(dc) up --detach
 
-HELP += $(call help,halt,  Stop the development environment)
+HELP += $(call help,halt,              Stop the development environment)
 halt:
 	$(dc) down
 
-HELP += $(call help,destroy,  Destroy the development environment)
+HELP += $(call help,destroy,           Destroy the development environment)
 destroy: halt
 	$(dc) rm --force

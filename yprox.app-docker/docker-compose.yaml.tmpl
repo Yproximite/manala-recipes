@@ -18,7 +18,24 @@ services:
     volumes:
       - type: bind
         source: .manala/.docker/db-data
-        target: /var/lib/postgresql/data
+        target: /var/lib/postgresql/data:z
+
+  database_test:
+    restart: unless-stopped
+    image: 'postgres:{{ $postgresql.version }}-alpine'
+    ports: [5432]
+    environment:
+      POSTGRES_USER: 'test'
+      POSTGRES_PASSWORD: 'test'
+      POSTGRES_DB: 'test'
+      TZ: {{ .Vars.system.timezone }}
+      PGTZ: {{ .Vars.system.timezone }}
+    volumes:
+      - type: bind
+        source: .manala/.docker/db-data-test
+        target: /var/lib/postgresql/data:z
+    labels:
+        com.symfony.server.service-prefix: 'DATABASE_TEST'
 {{- end }}
 
 {{- if .Vars.system.mariadb.version -}}
@@ -36,7 +53,23 @@ services:
     volumes:
       - type: bind
         source: .manala/.docker/db-data
-        target: /var/lib/mysql
+        target: /var/lib/mysql:z
+
+  database_test:
+    restart: unless-stopped
+    image: 'mariadb:{{ $mariadb.version }}-alpine'
+    ports: [3306]
+    environment:
+      MYSQL_USER: 'test'
+      MYSQL_PASSWORD: 'test'
+      MYSQL_DATABASE: 'test'
+      TZ: {{ .Vars.system.timezone }}
+    volumes:
+      - type: bind
+        source: .manala/.docker/db-data-test
+        target: /var/lib/mysql:z
+    labels:
+        com.symfony.server.service-prefix: 'DATABASE_TEST'
 {{- end }}
 
 {{- if .Vars.system.redis.version }}
@@ -50,5 +83,5 @@ services:
     volumes:
       - type: bind
         source: .manala/.docker/redis-data
-        target: /data
+        target: /data:z
 {{- end }}
