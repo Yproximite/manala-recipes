@@ -73,9 +73,10 @@ endef
 #######
 
 # Usage:
-#   $(call log, Foo bar)         = [11:06:20] [target] Foo bar
-#   $(call log_warning, Foo bar) = [11:06:20] [target] ¯\_(ツ)_/¯ Foo bar
-#   $(call log_error, Foo bar)   = [11:06:20] [target] (╯°□°)╯︵ ┻━┻ Foo bar
+#   $(call log, Foo bar)                  = [11:06:20] [target] Foo bar
+#   $(call log_warning, Foo bar)          = [11:06:20] [target] ¯\_(ツ)_/¯ Foo bar
+#   $(call log_error, Foo bar)            = [11:06:20] [target] (╯°□°)╯︵ ┻━┻ Foo bar
+#   $(call log_and_call, echo 'Message')  = [11:06:20] [target] echo 'Message'          then execute the command
 
 define log
 	printf "[$(COLOR_COMMENT)$(call time)$(COLOR_RESET)] [$(COLOR_COMMENT)$(@)$(COLOR_RESET)] " ; $(call message, $(1))
@@ -87,4 +88,9 @@ endef
 
 define log_error
 	printf "[$(COLOR_COMMENT)$(call time)$(COLOR_RESET)] [$(COLOR_COMMENT)$(@)$(COLOR_RESET)] " ;  $(call message_error, $(1))
+endef
+
+define log_and_call
+	$(call log, $(1))
+	$(1)
 endef
