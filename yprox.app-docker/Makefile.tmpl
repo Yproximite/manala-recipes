@@ -1,0 +1,63 @@
+{{- with .Vars.system -}}
+.SILENT:
+
+-include .manala/Makefile
+
+define setup
+    $(MAKE) install-app
+    $(MAKE) init-db@test
+endef
+
+###########
+# Install #
+###########
+
+## Install application
+install-app: composer-install init-db
+install-app:
+	$(php) bin/console cache:clear
+	yarn install
+	yarn dev
+
+## Install application for test environment
+install-app@test: export APP_ENV=test
+install-app@test: install-app
+
+## Install application in integration environment
+install-app@integration: export APP_ENV=test
+install-app@integration:
+	# Composer
+	$(composer) install --ansi --verbose --no-interaction --no-progress --prefer-dist --optimize-autoloader
+	# Yarn
+	yarn install --color=always --no-progress --frozen-lockfile
+	yarn dev
+
+	$(MAKE) init-db@integration
+
+################
+# Common tasks #
+################
+
+composer-install:
+	$(composer) install --verbose --no-interaction
+
+init-db:
+	$(php) bin/console doctrine:database:drop --force --if-exists --no-interaction
+	$(php) bin/console doctrine:database:create --no-interaction
+	$(php) bin/console doctrine:schema:update --force --no-interaction # to remove when we will use migrations
+	# $(php) bin/console doctrine:migrations:migrate --no-interaction
+	$(php) bin/console hautelook:fixtures:load --no-interaction
+
+init-db@test: export APP_ENV=test
+init-db@test: init-db
+
+init-db@integration:
+	bin/console doctrine:database:create --no-interaction
+	bin/console doctrine:schema:update --force --no-interaction # to remove when we will use migrations
+	# bin/console doctrine:migrations:migrate --no-interaction
+	bin/console hautelook:fixtures:load --no-interaction
+
+reload-db@test:
+	APP_ENV=test bin/console hautelook:fixtures:load --purge-with-truncate --no-interaction
+
+{{- end }}

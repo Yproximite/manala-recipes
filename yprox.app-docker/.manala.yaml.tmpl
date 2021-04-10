@@ -1,0 +1,34 @@
+{{- with .Vars.system -}}
+
+####################################################################
+# !!! REMINDER !!!                                                 #
+# Don't forget to run `manala up` each time you update this file ! #
+####################################################################
+
+manala:
+    recipe: yprox.app-docker
+    repository: https://github.com/Yproximite/manala-recipes.git
+
+##########
+# System #
+##########
+
+system:
+    app_name: {{ .app_name | toYaml }}
+
+    {{- if .mariadb.version }}
+    mariadb:
+        version: {{ .mariadb.version | toYaml }}
+    {{- end }}
+
+    {{- if .postgresql.version }}
+    postgresql:
+        version: {{ .postgresql.version | toYaml }}
+    {{- end }}
+
+    {{- if .redis.version }}
+    redis:
+        version: {{ .redis.version | toYaml }}
+    {{- end }}
+
+{{- end }}
