@@ -20,6 +20,8 @@ symfony := symfony
 php := $(symfony) php
 composer := $(symfony) composer
 
+HELP += $(call help_section, Environment)
+
 HELP += $(call help,setup,             Setup the development environment)
 setup: setup-symfony build-docker
 	$(call log_and_call, $(dc) up --detach)
@@ -69,3 +71,5 @@ destroy: halt
 	echo
 	$(call message_error, ALL CONTAINERS HAVE BEEN DESTROYED)
 	echo
+
+HELP += $(call help_section, Project)
