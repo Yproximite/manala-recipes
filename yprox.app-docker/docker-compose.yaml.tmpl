@@ -19,6 +19,8 @@ services:
       - type: bind
         source: .manala/.docker/db-data
         target: /var/lib/postgresql/data:z
+    labels:
+        com.symfony.server.service-prefix: 'DATABASE_APP'
 
   database_test:
     restart: unless-stopped
@@ -54,6 +56,8 @@ services:
       - type: bind
         source: .manala/.docker/db-data
         target: /var/lib/mysql:z
+    labels:
+        com.symfony.server.service-prefix: 'DATABASE_APP'
 
   database_test:
     restart: unless-stopped
