@@ -1,0 +1,91 @@
+version: '3.6'
+
+services:
+
+{{- if .Vars.system.postgresql.version -}}
+{{- $postgresql := .Vars.system.postgresql }}
+
+  database:
+    restart: unless-stopped
+    image: 'postgres:{{ $postgresql.version }}-alpine'
+    ports: [5432]
+    environment:
+      POSTGRES_USER: 'app'
+      POSTGRES_PASSWORD: 'app'
+      POSTGRES_DB: 'app'
+      TZ: {{ .Vars.system.timezone }}
+      PGTZ: {{ .Vars.system.timezone }}
+    volumes:
+      - type: bind
+        source: .manala/.docker/db-data
+        target: /var/lib/postgresql/data:z
+    labels:
+        com.symfony.server.service-prefix: 'DATABASE_APP'
+
+  database_test:
+    restart: unless-stopped
+    image: 'postgres:{{ $postgresql.version }}-alpine'
+    ports: [5432]
+    environment:
+      POSTGRES_USER: 'test'
+      POSTGRES_PASSWORD: 'test'
+      POSTGRES_DB: 'test'
+      TZ: {{ .Vars.system.timezone }}
+      PGTZ: {{ .Vars.system.timezone }}
+    volumes:
+      - type: bind
+        source: .manala/.docker/db-data-test
+        target: /var/lib/postgresql/data:z
+    labels:
+        com.symfony.server.service-prefix: 'DATABASE_TEST'
+{{- end }}
+
+{{- if .Vars.system.mariadb.version -}}
+{{- $mariadb := .Vars.system.mariadb }}
+
+  database:
+    restart: unless-stopped
+    image: 'mariadb:{{ $mariadb.version }}-alpine'
+    ports: [3306]
+    environment:
+      MYSQL_USER: 'app'
+      MYSQL_PASSWORD: 'app'
+      MYSQL_DATABASE: 'app'
+      TZ: {{ .Vars.system.timezone }}
+    volumes:
+      - type: bind
+        source: .manala/.docker/db-data
+        target: /var/lib/mysql:z
+    labels:
+        com.symfony.server.service-prefix: 'DATABASE_APP'
+
+  database_test:
+    restart: unless-stopped
+    image: 'mariadb:{{ $mariadb.version }}-alpine'
+    ports: [3306]
+    environment:
+      MYSQL_USER: 'test'
+      MYSQL_PASSWORD: 'test'
+      MYSQL_DATABASE: 'test'
+      TZ: {{ .Vars.system.timezone }}
+    volumes:
+      - type: bind
+        source: .manala/.docker/db-data-test
+        target: /var/lib/mysql:z
+    labels:
+        com.symfony.server.service-prefix: 'DATABASE_TEST'
+{{- end }}
+
+{{- if .Vars.system.redis.version }}
+
+  redis:
+    restart: unless-stopped
+    image: 'redis:alpine'
+    ports: [6379]
+    environment:
+      TZ: {{ .Vars.system.timezone }}
+    volumes:
+      - type: bind
+        source: .manala/.docker/redis-data
+        target: /data:z
+{{- end }}

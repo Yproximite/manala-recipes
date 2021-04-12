@@ -1,0 +1,29 @@
+manala:
+    description: yProximite - Generic application using Docker
+    template: .manala.yaml.tmpl
+    sync:
+        - .manala/
+        - docker-compose.yaml.tmpl
+        - Makefile.tmpl
+        - php.ini.tmpl
+
+system:
+    # @option {"label": "App name (in kebab-case)"}
+    # @schema {"type": "string"}
+    app_name: ~
+    # @schema {"type": ["string"], "pattern": "^[a-zA-Z]+/[a-zA-Z]+$"}
+    timezone: Etc/UTC
+    mariadb:
+        # @option {"label": "MariaDB version"}
+        # @schema {"enum": [null, 10.5, 10.4, 10.3, 10.2, 10.1, "10.0"]}
+        version: ~
+    postgresql:
+        # @option {"label": "PostgreSQL version"}
+        # @schema {"enum": [null, 14, 12, 11, 10, 9.6]}
+        version: ~
+    redis:
+        # @option {"label": "Redis version"}
+        # @schema {"enum": [null, "*"]}
+        version: ~
+        # @schema {"type": ["object", "array"]}
+        config: {}
