@@ -4,13 +4,20 @@
 
 version: '3.6'
 
+volumes:
+    {{ if or (.Vars.system.postgresql.version) (.Vars.system.mariadb.version) -}}
+    db-data:
+    {{- end }}
+    {{ if .Vars.system.redis.version -}}
+    redis-data:
+    {{- end }}
+
 services:
 
 {{- if .Vars.system.postgresql.version -}}
 {{- $postgresql := .Vars.system.postgresql }}
 
   database:
-    restart: unless-stopped
     image: 'postgres:{{ $postgresql.version }}-alpine'
     ports: [5432]
     environment:
@@ -20,16 +27,13 @@ services:
       TZ: {{ .Vars.system.timezone }}
       PGTZ: {{ .Vars.system.timezone }}
     volumes:
-      - type: bind
-        source: .manala/.docker/db-data
-        target: /var/lib/postgresql/data:z
+      - db-data:/var/lib/postgresql/data
 {{- end }}
 
 {{- if .Vars.system.mariadb.version -}}
 {{- $mariadb := .Vars.system.mariadb }}
 
   database:
-    restart: unless-stopped
     image: 'mariadb:{{ $mariadb.version }}-alpine'
     ports: [3306]
     environment:
@@ -38,21 +42,16 @@ services:
       MYSQL_DATABASE: 'app'
       TZ: {{ .Vars.system.timezone }}
     volumes:
-      - type: bind
-        source: .manala/.docker/db-data
-        target: /var/lib/mysql:z
+      - db-data:/var/lib/mysql
 {{- end }}
 
 {{- if .Vars.system.redis.version }}
 
   redis:
-    restart: unless-stopped
     image: 'redis:alpine'
     ports: [6379]
     environment:
       TZ: {{ .Vars.system.timezone }}
     volumes:
-      - type: bind
-        source: .manala/.docker/redis-data
-        target: /data:z
+      - redis-data:/data
 {{- end }}
