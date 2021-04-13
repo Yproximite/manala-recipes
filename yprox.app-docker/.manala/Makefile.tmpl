@@ -49,9 +49,7 @@ setup-symfony@integration:
 
 build-docker:
 	$(call log_and_call, mkdir -p $(_ROOT_DIR)/.manala/.docker/db-data)
-	$(call log_and_call, mkdir -p $(_ROOT_DIR)/.manala/.docker/db-data-test)
 	$(call log_and_call, mkdir -p $(_ROOT_DIR)/.manala/.docker/redis-data)
-	$(call log_and_call, mkdir -p $(_ROOT_DIR)/.manala/.docker/redis-data-test)
 	$(call log_and_call, $(dc) build)
 
 HELP += $(call help,up,                Start the development environment)
