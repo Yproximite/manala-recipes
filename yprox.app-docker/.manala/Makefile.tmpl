@@ -24,8 +24,8 @@ HELP += $(call help_section, Environment)
 
 HELP += $(call help,setup,             Setup the development environment)
 setup: setup-symfony build-docker
-	$(call log_and_call, $(dc) up --detach)
-	$(call log_and_call, $(setup))
+	$(dc) up --detach
+	$(setup)
 	echo
 	$(call message_success, The development environment has been successfully set up.)
 	echo
@@ -33,39 +33,39 @@ setup: setup-symfony build-docker
 HELP += $(call help,setup@integration, Setup the integration environment)
 setup@integration: export APP_ENV=test
 setup@integration: setup-symfony@integration build-docker
-	$(call log_and_call, $(dc) up --detach)
-	$(call log_and_call, $(setup_integration))
+	$(dc) up --detach
+	$(setup_integration)
 	echo
 	$(call message_success, The integration environment has been successfully set up.)
 	echo
 
 setup-symfony:
-	$(call log_and_call, $(symfony) server:ca:install)
-	$(call log_and_call, $(symfony) proxy:start)
-	$(call log_and_call, $(symfony) proxy:domain:attach {{ .Vars.system.app_name }})
+	$(symfony) server:ca:install
+	$(symfony) proxy:start
+	$(symfony) proxy:domain:attach {{ .Vars.system.app_name }}
 
 setup-symfony@integration:
-	$(call log_and_call, $(symfony) server:ca:install)
+	$(symfony) server:ca:install
 
 build-docker:
-	$(call log_and_call, mkdir -p $(_ROOT_DIR)/.manala/.docker/db-data)
-	$(call log_and_call, mkdir -p $(_ROOT_DIR)/.manala/.docker/redis-data)
-	$(call log_and_call, $(dc) build)
+	mkdir -p $(_ROOT_DIR)/.manala/.docker/db-data
+	mkdir -p $(_ROOT_DIR)/.manala/.docker/redis-data
+	$(dc) build
 
 HELP += $(call help,up,                Start the development environment)
 up:
-	$(call log_and_call, $(dc) up --detach)
+	$(dc) up --detach
 	echo
 	$(call message_success, You can now run the Symfony server)
 	echo
 
 HELP += $(call help,halt,              Stop the development environment)
 halt:
-	$(call log_and_call, $(dc) down)
+	$(dc) down
 
 HELP += $(call help,destroy,           Destroy the development environment)
 destroy: halt
-	$(call log_and_call, $(dc) rm --force)
+	$(dc) rm --force
 	echo
 	$(call message_error, ALL CONTAINERS HAVE BEEN DESTROYED)
 	echo

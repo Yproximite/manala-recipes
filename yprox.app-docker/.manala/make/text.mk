@@ -89,8 +89,3 @@ endef
 define log_error
 	printf "[$(COLOR_COMMENT)$(call time)$(COLOR_RESET)] [$(COLOR_COMMENT)$(@)$(COLOR_RESET)] " ;  $(call message_error, $(1))
 endef
-
-define log_and_call
-	$(call log, $(1))
-	$(1)
-endef
