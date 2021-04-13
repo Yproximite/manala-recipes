@@ -326,8 +326,16 @@ my-app_redis_1           docker-entrypoint.sh redis ...   Up      0.0.0.0:49234-
 
 It's possible to use [Redis Commander](https://github.com/joeferner/redis-commander) as Redis UI.
 
-After its installation, run `redis-commander` in the folder of your app.
-The tool will automatically detects Docker Compose usage and will use the Redis container's port (here **49234**)
+After its installation, run `redis-commander --redis-port <to determine>` in the folder of your app.
+To determine the port, run `docker-compose ps` and find the one open by Docker for the container `...redis_1`.
+Here, it's the port **49234**:
+
+```
+     Name                              Command            State            Ports         
+-------------------------------------------------------------------------------------------------------
+my-app_database_1        docker-entrypoint.sh postgres    Up      0.0.0.0:49235->5432/tcp
+my-app_redis_1           docker-entrypoint.sh redis ...   Up      0.0.0.0:49234->6379/tcp
+```
 
 Then access http://127.0.0.1:8081, and an UI similar to this should be displayed:
 ![](./screenshots/redis-commander.png).
