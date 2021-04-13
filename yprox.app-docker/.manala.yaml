@@ -4,7 +4,6 @@ manala:
     sync:
         - .manala/
         - docker-compose.yaml.tmpl
-        - Makefile.tmpl
         - php.ini.tmpl
 
 system:

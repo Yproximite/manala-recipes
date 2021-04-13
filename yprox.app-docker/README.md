@@ -30,11 +30,11 @@ echo 14 > .nvmrc # Use Node.js 14
 
 Those files will be used by:
 - The Symfony CLI when using `symfony php` and `symfony composer` (eg: `symfony php bin/console cache:clear, `symfony composer install)
-- NVM when using `nvm use`. If you use ZSH, you can install the plugin [zsh-nvm-auto-switch](https://github.com/aspirewit/zsh-nvm-auto-switch) that will automatically run `nvm use` when encountering a `.nvmrc` file
+- NVM when using `nvm use`
 - GitHub Actions, thanks to [the action `setup-environment`](#github-actions)
 
 **It is important to use `symfony php` and not `php` directly for running commands, thanks to its [Docker integration](https://symfony.com/doc/current/setup/symfony_server.html#docker-integration) 
-it automatically exposes environments variables from Docker (eg: `DATABASE_APP_URL`, `REDIS_URL`, ...) to PHP.**
+it automatically exposes environments variables from Docker (eg: `DATABASE_URL`, `REDIS_URL`, ...) to PHP.**
 
 ## Quick start
 
