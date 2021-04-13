@@ -15,6 +15,7 @@ manala:
 
 system:
     app_name: {{ .app_name | toYaml }}
+    timezone: Etc/UTC
 
     {{- if .mariadb.version }}
     mariadb:
