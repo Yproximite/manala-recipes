@@ -299,11 +299,9 @@ reload-db@test:
 
 ### Tools
 
-#### Admin UI for databases
+#### Admin UI for database
 
 Databases access can be done through PHPStorm (or DataGrip), credentials can be found in `docker-compose.yaml` file.
-
-##### Primary database
 
 - Username: `app`
 - Password: `app`
@@ -317,30 +315,12 @@ Here, it's the port **49235**:
      Name                              Command            State            Ports         
 -------------------------------------------------------------------------------------------------------
 my-app_database_1        docker-entrypoint.sh postgres    Up      0.0.0.0:49235->5432/tcp
-my-app_database_test_1   docker-entrypoint.sh postgres    Up      0.0.0.0:49233->5432/tcp
 my-app_redis_1           docker-entrypoint.sh redis ...   Up      0.0.0.0:49234->6379/tcp
 ```
 
 ![](./screenshots/bdd-app.png)
 
 ![](./screenshots/bdd-app-schemas.png)
-
-##### Test database
-
-- Username: `test`
-- Password: `test`
-- Host: `localhost`
-- Port : **to determine**
-
-To determine the port, run `docker-compose ps` and find the one open by Docker for the container `..._database_1`.
-Here, it's the port **49233**:
-```
-     Name                              Command            State            Ports         
--------------------------------------------------------------------------------------------------------
-my-app_database_1        docker-entrypoint.sh postgres    Up      0.0.0.0:49235->5432/tcp
-my-app_database_test_1   docker-entrypoint.sh postgres    Up      0.0.0.0:49233->5432/tcp
-my-app_redis_1           docker-entrypoint.sh redis ...   Up      0.0.0.0:49234->6379/tcp
-```
 
 #### Admin UI for Redis
 
