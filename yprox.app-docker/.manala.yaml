@@ -4,7 +4,6 @@ manala:
     sync:
         - .manala/
         - docker-compose.yaml.tmpl
-        - Makefile.tmpl
         - php.ini.tmpl
 
 system:
@@ -19,7 +18,7 @@ system:
         version: ~
     postgresql:
         # @option {"label": "PostgreSQL version"}
-        # @schema {"enum": [null, 14, 12, 11, 10, 9.6]}
+        # @schema {"enum": [null, 13, 12, 11, 10, 9.6]}
         version: ~
     redis:
         # @option {"label": "Redis version"}

@@ -30,11 +30,11 @@ echo 14 > .nvmrc # Use Node.js 14
 
 Those files will be used by:
 - The Symfony CLI when using `symfony php` and `symfony composer` (eg: `symfony php bin/console cache:clear, `symfony composer install)
-- NVM when using `nvm use`. If you use ZSH, you can install the plugin [zsh-nvm-auto-switch](https://github.com/aspirewit/zsh-nvm-auto-switch) that will automatically run `nvm use` when encountering a `.nvmrc` file
+- NVM when using `nvm use`
 - GitHub Actions, thanks to [the action `setup-environment`](#github-actions)
 
 **It is important to use `symfony php` and not `php` directly for running commands, thanks to its [Docker integration](https://symfony.com/doc/current/setup/symfony_server.html#docker-integration) 
-it automatically exposes environments variables from Docker (eg: `DATABASE_APP_URL`, `REDIS_URL`, ...) to PHP.**
+it automatically exposes environments variables from Docker (eg: `DATABASE_URL`, `REDIS_URL`, ...) to PHP.**
 
 ## Quick start
 
@@ -49,19 +49,19 @@ Select the "yprox.app-docker" recipe
 Edit the `Makefile` at the root directory of your project and add the following lines at the beginning of the file:
 
 ```makefile
-.SILENT:
-
 -include .manala/Makefile
 
-# This function will be called during "make setup"
+# This function will be called at the end of "make setup"
 define setup
-    $(call log_and_call, $(MAKE) install-app)
-    $(call log_and_call, $(MAKE) init-db@test)
+	# For example:
+	# $(MAKE) install-app
+	# $(MAKE) init-db@test
 endef
 
-# This function will be called during "make setup@integration"
+# This function will be called at the end of "make setup@integration"
 define setup_integration
-    $(call log_and_call, $(MAKE) install-app@integration)
+	# For example:
+	# $(MAKE) install-app@integration
 endef
 ```
 
@@ -239,13 +239,13 @@ Add in your `Makefile`:
 
 # This function will be called during "make setup"
 define setup
-    $(call log_and_call, $(MAKE) install-app)
-    $(call log_and_call, $(MAKE) init-db@test)
+    $(MAKE) install-app
+    $(MAKE) init-db@test
 endef
 
 # This function will be called during "make setup@integration"
 define setup_integration
-    $(call log_and_call, $(MAKE) install-app@integration)
+    $(MAKE) install-app@integration
 endef
 
 ###########
@@ -255,47 +255,46 @@ endef
 ## Install application
 install-app: composer-install init-db
 install-app:
-	$(call log_and_call, $(php) bin/console cache:clear)
-	$(call log_and_call, yarn install)
-	$(call log_and_call, yarn dev)
+	$(php) bin/console cache:clear
+	yarn install
+	yarn dev
 
 ## Install application in integration environment
 install-app@integration: export APP_ENV=test
 install-app@integration:
-	$(call log_and_call, $(composer) install --ansi --no-interaction --no-progress --prefer-dist --optimize-autoloader)
-	$(call log_and_call, yarn install --color=always --no-progress --frozen-lockfile)
-	$(call log_and_call, yarn dev)
-	$(call log_and_call, $(MAKE) init-db@integration)
+	$(composer) install --ansi --no-interaction --no-progress --prefer-dist --optimize-autoloader
+	yarn install --color=always --no-progress --frozen-lockfile
+	yarn dev
+	$(MAKE) init-db@integration
 
 ################
 # Common tasks #
 ################
 
 composer-install:
-	$(call log_and_call, $(composer) install --ansi --no-interaction)
+	$(composer) install --ansi --no-interaction
 
 init-db:
-	$(call log_and_call, $(php) bin/console doctrine:database:drop --force --if-exists --no-interaction)
-	$(call log_and_call, $(php) bin/console doctrine:database:create --no-interaction)
-	$(call log_and_call, $(php) bin/console doctrine:schema:update --force --no-interaction) # to remove when we will use migrations
+	$(php) bin/console doctrine:database:drop --force --if-exists --no-interaction
+	$(php) bin/console doctrine:database:create --no-interaction
+	$(php) bin/console doctrine:schema:update --force --no-interaction # to remove when we will use migrations
 	# $(php) bin/console doctrine:migrations:migrate --no-interaction
-	$(call log_and_call, $(php) bin/console hautelook:fixtures:load --no-interaction)
+	$(php) bin/console hautelook:fixtures:load --no-interaction
 
 init-db@test: export APP_ENV=test
 init-db@test: init-db
 
 init-db@integration: export APP_ENV=test
 init-db@integration:
-	$(call log_and_call, $(php) bin/console doctrine:database:create --if-not-exists --no-interaction)
-	$(call log_and_call, $(php) bin/console doctrine:schema:update --force --no-interaction) # to remove when we will use migrations
+	$(php) bin/console doctrine:database:create --if-not-exists --no-interaction
+	$(php) bin/console doctrine:schema:update --force --no-interaction # to remove when we will use migrations
 	# $(php) bin/console doctrine:migrations:migrate --no-interaction
-	$(call log_and_call, $(php) bin/console hautelook:fixtures:load --no-interaction)
+	$(php) bin/console hautelook:fixtures:load --no-interaction
 
 reload-db@test: export APP_ENV=test
 reload-db@test:
-	$(call log_and_call, $(php) bin/console hautelook:fixtures:load --purge-with-truncate --no-interaction)
+	$(php) bin/console hautelook:fixtures:load --purge-with-truncate --no-interaction
 ```
-
 
 ### Tools
 
