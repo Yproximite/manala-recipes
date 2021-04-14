@@ -33,7 +33,7 @@ setup: setup-symfony
 
 HELP += $(call help,setup@integration, Setup the integration environment)
 setup@integration: export APP_ENV=test
-setup@integration: setup-symfony@integration build-docker
+setup@integration: setup-symfony@integration
 	$(dc) build
 	$(dc) up --detach
 	$(setup_integration)
