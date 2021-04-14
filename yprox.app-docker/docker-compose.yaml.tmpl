@@ -4,17 +4,23 @@
 
 version: '3.6'
 
+{{- $has_postgresql := .Vars.system.postgresql.version -}}
+{{- $has_mariadb := .Vars.system.mariadb.version -}}
+{{- $has_redis := .Vars.system.redis.version -}}
+
+{{ if or ($has_postgresql) ($has_mariadb) ($has_redis) }}
+
 volumes:
-    {{ if or (.Vars.system.postgresql.version) (.Vars.system.mariadb.version) -}}
+    {{ if or ($has_postgresql) ($has_mariadb) -}}
     db-data:
     {{- end }}
-    {{ if .Vars.system.redis.version -}}
+    {{ if $has_redis -}}
     redis-data:
     {{- end }}
+{{- end }}
 
 services:
-
-{{- if .Vars.system.postgresql.version -}}
+{{- if $has_postgresql -}}
 {{- $postgresql := .Vars.system.postgresql }}
 
   database:
@@ -30,7 +36,7 @@ services:
       - db-data:/var/lib/postgresql/data
 {{- end }}
 
-{{- if .Vars.system.mariadb.version -}}
+{{- if $has_mariadb -}}
 {{- $mariadb := .Vars.system.mariadb }}
 
   database:
@@ -45,7 +51,7 @@ services:
       - db-data:/var/lib/mysql
 {{- end }}
 
-{{- if .Vars.system.redis.version }}
+{{- if $has_redis }}
 
   redis:
     image: 'redis:alpine'
