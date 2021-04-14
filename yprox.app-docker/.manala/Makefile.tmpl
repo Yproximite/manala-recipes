@@ -62,7 +62,7 @@ halt:
 
 HELP += $(call help,destroy,           Destroy the development environment)
 destroy: halt
-	$(dc) rm --force
+	$(dc) down --volumes
 	@echo
 	@$(call message_error, ALL CONTAINERS HAVE BEEN DESTROYED)
 	@echo
