@@ -44,10 +44,13 @@ setup@integration: setup-symfony@integration
 setup-symfony:
 	$(symfony) server:ca:install
 	$(symfony) proxy:start
-	$(symfony) proxy:domain:attach {{ .Vars.system.app_name }}
+	$(MAKE) setup-domain
 
 setup-symfony@integration:
 	$(symfony) server:ca:install
+
+setup-domain:
+	$(symfony) proxy:domain:attach {{ .Vars.system.app_name }}
 
 HELP += $(call help,up,                Start the development environment)
 up:
