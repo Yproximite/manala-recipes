@@ -40,7 +40,7 @@ services:
 {{- $mariadb := .Vars.system.mariadb }}
 
   database:
-    image: 'mariadb:{{ $mariadb.version }}-alpine'
+    image: 'mariadb:{{ $mariadb.version }}'
     ports: [3306]
     environment:
       MYSQL_USER: 'app'
