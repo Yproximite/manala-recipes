@@ -17,6 +17,19 @@ system:
     app_name: {{ .app_name | toYaml }}
     timezone: Etc/UTC
 
+    php:
+        configs:
+            # XDebug
+            - config: |
+                ; Comment/uncomment the following lines to disable/enable XDebug
+                ;zend_extension=xdebug.so
+                ;xdebug.remote_enable=1
+                ;xdebug.remote_autostart=1
+
+            # App
+            - config: |
+                ;App specific configuration
+
     {{- if .mariadb.version }}
     mariadb:
         version: {{ .mariadb.version | toYaml }}

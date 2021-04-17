@@ -12,6 +12,16 @@ system:
     app_name: ~
     # @schema {"type": ["string"], "pattern": "^[a-zA-Z]+/[a-zA-Z]+$"}
     timezone: Etc/UTC
+    php:
+        # @schema {
+        #     "items": {"type": "object",
+        #         "additionalProperties": false,
+        #         "properties": {
+        #             "config": {"type": ["object", "string", "array"]}
+        #         }
+        #     }
+        # }
+        configs: []
     mariadb:
         # @option {"label": "MariaDB version"}
         # @schema {"enum": [null, 10.5, 10.4, 10.3, 10.2, 10.1, "10.0"]}

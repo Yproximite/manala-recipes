@@ -4,3 +4,7 @@
 
 [Date]
 date.timezone = {{ .Vars.system.timezone }}
+
+{{ range .Vars.system.php.configs }}
+    {{- .config }}
+{{ end -}}
