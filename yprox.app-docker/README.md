@@ -300,41 +300,9 @@ reload-db@test:
 
 #### Admin UI for database
 
-Databases access can be done through PHPStorm (or DataGrip), credentials can be found in `docker-compose.yaml` file.
-
-- Username: `app`
-- Password: `app`
-- Host: `localhost`
-- Port : **to dermine**
-
-To determine the port, run `docker-compose ps` and find the one open by Docker for the container `..._database_1`.
-Here, it's the port **49235**:
-
-```
-     Name                              Command            State            Ports         
--------------------------------------------------------------------------------------------------------
-my-app_database_1        docker-entrypoint.sh postgres    Up      0.0.0.0:49235->5432/tcp
-my-app_redis_1           docker-entrypoint.sh redis ...   Up      0.0.0.0:49234->6379/tcp
-```
-
-![](./screenshots/bdd-app.png)
-
-![](./screenshots/bdd-app-schemas.png)
+- If you use PostgreSQL, run `make run-phppgadmin` to run a local [PhpPgAdmin](https://github.com/phppgadmin/phppgadmin) instance
+- If using MariaDB, run `make run-phpmyadmin` to run a local [PhpMyAdmin](https://github.com/phpmyadmin/phpmyadmin) instance
 
 #### Admin UI for Redis
 
-It's possible to use [Redis Commander](https://github.com/joeferner/redis-commander) as Redis UI.
-
-After its installation, run `redis-commander --redis-port <to determine>` in the folder of your app.
-To determine the port, run `docker-compose ps` and find the one open by Docker for the container `...redis_1`.
-Here, it's the port **49234**:
-
-```
-     Name                              Command            State            Ports         
--------------------------------------------------------------------------------------------------------
-my-app_database_1        docker-entrypoint.sh postgres    Up      0.0.0.0:49235->5432/tcp
-my-app_redis_1           docker-entrypoint.sh redis ...   Up      0.0.0.0:49234->6379/tcp
-```
-
-Then access http://127.0.0.1:8081, and an UI similar to this should be displayed:
-![](./screenshots/redis-commander.png).
+Run `make run-phpredisadmin` to run a local [PhpRedisAdmin](https://github.com/erikdubbelboer/phpRedisAdmin) instance.
