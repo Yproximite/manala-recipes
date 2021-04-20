@@ -62,6 +62,7 @@ services:
       TZ: {{ .Vars.system.timezone }}
     volumes:
       - db-data:/var/lib/mysql
+      - .manala/init-db:/docker-entrypoint-initdb.d
     healthcheck:
       test: mysqladmin ping --silent
       interval: 10s
