@@ -29,7 +29,7 @@ echo 14 > .nvmrc # Use Node.js 14
 ```
 
 Those files will be used by:
-- The Symfony CLI when using `symfony php` and `symfony composer` (eg: `symfony php bin/console cache:clear, `symfony composer install)
+- The Symfony CLI when using `symfony php` and `symfony composer` (eg: `symfony console cache:clear, `symfony composer install)
 - NVM when using `nvm use`
 - GitHub Actions, thanks to [the action `setup-environment`](#github-actions)
 
@@ -192,10 +192,10 @@ jobs:
             - run: node -v # Node.js 14.16.0
 
             # Run some tests... remember to use "symfony php" and not "php"
-            - run: symfony php bin/console cache:clear
-            - run: symfony php bin/console lint:twig templates
-            - run: symfony php bin/console lint:yaml config --parse-tags
-            - run: symfony php bin/console lint:xliff translations
+            - run: symfony console cache:clear
+            - run: symfony console lint:twig templates
+            - run: symfony console lint:yaml config --parse-tags
+            - run: symfony console lint:xliff translations
 
 ```
 
@@ -255,7 +255,7 @@ endef
 ## Install application
 install-app: composer-install init-db
 install-app:
-	$(php) bin/console cache:clear
+	$(symfony) console cache:clear
 	yarn install
 	yarn dev
 
@@ -275,25 +275,25 @@ composer-install:
 	$(composer) install --ansi --no-interaction
 
 init-db:
-	$(php) bin/console doctrine:database:drop --force --if-exists --no-interaction
-	$(php) bin/console doctrine:database:create --no-interaction
-	$(php) bin/console doctrine:schema:update --force --no-interaction # to remove when we will use migrations
-	# $(php) bin/console doctrine:migrations:migrate --no-interaction
-	$(php) bin/console hautelook:fixtures:load --no-interaction
+	$(symfony) console doctrine:database:drop --force --if-exists --no-interaction
+	$(symfony) console doctrine:database:create --no-interaction
+	$(symfony) console doctrine:schema:update --force --no-interaction # to remove when we will use migrations
+	# $(symfony) console doctrine:migrations:migrate --no-interaction
+	$(symfony) console hautelook:fixtures:load --no-interaction
 
 init-db@test: export APP_ENV=test
 init-db@test: init-db
 
 init-db@integration: export APP_ENV=test
 init-db@integration:
-	$(php) bin/console doctrine:database:create --if-not-exists --no-interaction
-	$(php) bin/console doctrine:schema:update --force --no-interaction # to remove when we will use migrations
-	# $(php) bin/console doctrine:migrations:migrate --no-interaction
-	$(php) bin/console hautelook:fixtures:load --no-interaction
+	$(symfony) console doctrine:database:create --if-not-exists --no-interaction
+	$(symfony) console doctrine:schema:update --force --no-interaction # to remove when we will use migrations
+	# $(symfony) console doctrine:migrations:migrate --no-interaction
+	$(symfony) console hautelook:fixtures:load --no-interaction
 
 reload-db@test: export APP_ENV=test
 reload-db@test:
-	$(php) bin/console hautelook:fixtures:load --purge-with-truncate --no-interaction
+	$(symfony) console hautelook:fixtures:load --purge-with-truncate --no-interaction
 ```
 
 ### Tools
