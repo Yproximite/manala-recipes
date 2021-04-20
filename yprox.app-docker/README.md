@@ -215,7 +215,7 @@ runs:
 
         # Composer cache
         - id: composer-cache
-          run: echo "::set-output name=dir::$(composer config cache-files-dir)"
+          run: echo "::set-output name=dir::$(composer global config cache-files-dir)"
           shell: bash
 
         - run: echo "COMPOSER_CACHE_DIR=${{ steps.composer-cache.outputs.dir }}" >> $GITHUB_ENV
