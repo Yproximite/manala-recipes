@@ -17,7 +17,7 @@ endef
 
 help:
 	@printf "$(HELP)$(HELP_SUFFIX)"
-	awk ' \
+	@awk ' \
 		/^[-a-zA-Z0-9_.@%\/]+:/ { \
 			hasMessage = match(lastLine, /^## (.*)/); \
 			if (hasMessage) { \

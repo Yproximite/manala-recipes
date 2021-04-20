@@ -25,7 +25,7 @@ HELP += $(call help_section, Environment)
 HELP += $(call help,setup,             Setup the development environment)
 setup: setup-symfony
 	$(dc) build
-	$(dc) up --detach
+	$(MAKE) up
 	$(setup)
 	@echo
 	@$(call message_success, The development environment has been successfully set up.)
@@ -55,6 +55,9 @@ setup-domain:
 HELP += $(call help,up,                Start the development environment)
 up:
 	$(dc) up --detach
+	{{- if or (.Vars.system.postgresql.version) (.Vars.system.mariadb.version) }} database{{ end }}
+	{{- if .Vars.system.redis.version }} redis{{ end }}
+
 	@echo
 	@$(call message_success, You can now run the Symfony server)
 	@echo
@@ -69,5 +72,33 @@ destroy: halt
 	@echo
 	@$(call message_error, ALL CONTAINERS HAVE BEEN DESTROYED)
 	@echo
+
+HELP += $(call help_section, Development tools)
+
+{{- if .Vars.system.postgresql.version -}}
+HELP += $(call help,run-phppgadmin,    Start a PhpPgAdmin web interface)
+run-phppgadmin:
+	$(dc) up --detach phppgadmin
+	@echo
+	@$(call message_success, You can now open http://`$(dc) port phppgadmin 8080` to access PhpPgAdmin)
+	@echo
+{{- end }}
+
+{{ if .Vars.system.mariadb.version -}}
+HELP += $(call help,run-phpmyadmin,    Start a PhpMyAdmin web interface)
+run-phpmyadmin:
+	$(dc) up --detach phpmyadmin
+	@echo
+	@$(call message_success, You can now open http://`$(dc) port phpmyadmin 80` to access PhpMyAdmin)
+	@echo
+{{- end }}
+
+{{ if .Vars.system.redis.version -}}
+HELP += $(call help,run-phpredisadmin, Start a PhpRedisAdmin web interface)
+run-phpredisadmin:
+	$(dc) up --detach phpredisadmin
+	@echo
+	@$(call message_success, You can now open http://`$(dc) port phpredisadmin 80` to access PhpRedisAdmin)
+	@echo{{- end }}
 
 HELP += $(call help_section, Project)

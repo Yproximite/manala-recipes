@@ -34,6 +34,13 @@ services:
       PGTZ: {{ .Vars.system.timezone }}
     volumes:
       - db-data:/var/lib/postgresql/data
+
+  phppgadmin:
+    image: bitnami/phppgadmin
+    ports: [8080]
+    environment:
+      DATABASE_HOST: 'database'
+
 {{- end }}
 
 {{- if $has_mariadb -}}
@@ -50,6 +57,15 @@ services:
       TZ: {{ .Vars.system.timezone }}
     volumes:
       - db-data:/var/lib/mysql
+
+  phpmyadmin:
+    image: phpmyadmin
+    ports: [80]
+    environment:
+      PMA_HOST: 'database'
+      PMA_USER: 'app'
+      PMA_PASSWORD: 'app'
+
 {{- end }}
 
 {{- if $has_redis }}
@@ -61,4 +77,11 @@ services:
       TZ: {{ .Vars.system.timezone }}
     volumes:
       - redis-data:/data
+
+  phpredisadmin:
+    image: erikdubbelboer/phpredisadmin
+    ports: [80]
+    environment:
+      REDIS_1_HOST: 'redis'
+
 {{- end }}
