@@ -33,9 +33,9 @@ system:
     {{- if .mariadb.version }}
     mariadb:
         version: {{ .mariadb.version | toYaml }}
-        init:
-            - 'CREATE DATABASE IF NOT EXISTS `app_test`;'
-            - 'GRANT ALL ON `app_test`.* TO 'app'@'%';
+        init: |
+            CREATE DATABASE IF NOT EXISTS `app_test`;
+            GRANT ALL ON `app_test`.* TO 'app'@'%';
     {{- end }}
 
     {{- if .postgresql.version }}
