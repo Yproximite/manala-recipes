@@ -52,8 +52,7 @@ setup-domain:
 
 _up:
 	$(dc) up --detach
-	{{- if or (.Vars.system.postgresql.version) (.Vars.system.mariadb.version) }} database{{ end }}
-	{{- if or (.Vars.system.mysql.version) (.Vars.system.mysql.version) }} database{{ end }}
+	{{- if or (.Vars.system.postgresql.version) (.Vars.system.mariadb.version) (.Vars.system.mysql.version) }} database{{ end }}
 	{{- if .Vars.system.redis.version }} redis{{ end }}
 
 HELP += $(call help,up,                Start the development environment)
