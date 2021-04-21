@@ -28,6 +28,12 @@ system:
         version: ~
         # @schema {"type": ["string", "null"]}
         init: ~
+    mysql:
+        # @option {"label": "MySQL version"}
+        # @schema {"enum": [null, 5.7, 8, "8.0"]}
+        version: ~
+        # @schema {"type": ["string", "null"]}
+        init: ~
     postgresql:
         # @option {"label": "PostgreSQL version"}
         # @schema {"enum": [null, 13, 12, 11, 10, 9.6]}

@@ -6,12 +6,13 @@ version: '3.6'
 
 {{- $has_postgresql := .Vars.system.postgresql.version -}}
 {{- $has_mariadb := .Vars.system.mariadb.version -}}
+{{- $has_mysql := .Vars.system.mysql.version -}}
 {{- $has_redis := .Vars.system.redis.version -}}
 
-{{ if or ($has_postgresql) ($has_mariadb) ($has_redis) }}
+{{ if or ($has_postgresql) ($has_mariadb) ($has_mysql) ($has_redis) }}
 
 volumes:
-    {{ if or ($has_postgresql) ($has_mariadb) -}}
+    {{ if or ($has_postgresql) ($has_mariadb) ($has_mysql) -}}
     db-data:
     {{- end }}
     {{ if $has_redis -}}
@@ -53,6 +54,37 @@ services:
 
   database:
     image: 'mariadb:{{ $mariadb.version }}'
+    ports: [3306]
+    environment:
+      MYSQL_USER: 'app'
+      MYSQL_PASSWORD: 'app'
+      MYSQL_DATABASE: 'app'
+      MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+      TZ: {{ .Vars.system.timezone }}
+    volumes:
+      - db-data:/var/lib/mysql
+      - .manala/init-db:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: mysqladmin ping --silent
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  phpmyadmin:
+    image: phpmyadmin
+    ports: [80]
+    environment:
+      PMA_HOST: 'database'
+      PMA_USER: 'app'
+      PMA_PASSWORD: 'app'
+
+{{- end }}
+
+{{- if $has_mysql -}}
+{{- $mysql := .Vars.system.mysql }}
+
+  database:
+    image: 'mysql:{{ $mysql.version }}'
     ports: [3306]
     environment:
       MYSQL_USER: 'app'

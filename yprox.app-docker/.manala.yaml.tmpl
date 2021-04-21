@@ -38,6 +38,14 @@ system:
             GRANT ALL ON `app_test`.* TO 'app'@'%';
     {{- end }}
 
+    {{- if .mysql.version }}
+    mysql:
+        version: {{ .mysql.version | toYaml }}
+        init: |
+            CREATE DATABASE IF NOT EXISTS `app_test`;
+            GRANT ALL ON `app_test`.* TO 'app'@'%';
+    {{- end }}
+
     {{- if .postgresql.version }}
     postgresql:
         version: {{ .postgresql.version | toYaml }}
