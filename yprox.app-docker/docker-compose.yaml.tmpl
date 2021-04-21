@@ -70,14 +70,6 @@ services:
       timeout: 5s
       retries: 5
 
-  phpmyadmin:
-    image: phpmyadmin
-    ports: [80]
-    environment:
-      PMA_HOST: 'database'
-      PMA_USER: 'app'
-      PMA_PASSWORD: 'app'
-
 {{- end }}
 
 {{- if $has_mysql -}}
@@ -100,6 +92,10 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+
+{{- end }}
+
+{{- if or ($has_mariadb) ($has_mysql) }}
 
   phpmyadmin:
     image: phpmyadmin
