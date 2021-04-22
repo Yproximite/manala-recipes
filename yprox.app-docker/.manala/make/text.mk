@@ -47,7 +47,7 @@ define message_success
 endef
 
 define message_warning
-	printf "$(COLOR_WARNING)¯\_(ツ)_/¯ $(strip $(1))$(COLOR_RESET)\n"
+	printf "$(COLOR_WARNING)$(strip $(1))$(COLOR_RESET)\n"
 endef
 
 define message_error
