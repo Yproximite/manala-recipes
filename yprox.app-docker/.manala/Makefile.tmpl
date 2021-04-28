@@ -72,6 +72,7 @@ _up:
 HELP += $(call help,up,                Start the development environment)
 up:
 	$(MAKE) _up
+	$(symfony) proxy:start
 	@echo
 	@$(call message_success, You can now run the Symfony server)
 	@echo
