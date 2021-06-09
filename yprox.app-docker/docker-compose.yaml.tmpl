@@ -130,9 +130,10 @@ services:
 {{- end }}
 
 {{- if $has_mongo }}
+{{- $mongo := .Vars.system.mongo }}
 
   mongo:
-    image: 'mongo:alpine'
+    image: 'mongo:{{ $mongo.version }}-stretch'
     ports: [27017]
     environment:
       MONGO_INITDB_DATABASE: 'app'

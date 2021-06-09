@@ -46,5 +46,5 @@ system:
         config: {}
     mongo:
         # @option {"label": "MongoDB version"}
-        # @schema {"enum": [null, "*"]}
+        # @schema {"enum": [null, "3.6", "4"]}
         version: ~
