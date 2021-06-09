@@ -8,8 +8,9 @@ version: '3.6'
 {{- $has_mariadb := .Vars.system.mariadb.version -}}
 {{- $has_mysql := .Vars.system.mysql.version -}}
 {{- $has_redis := .Vars.system.redis.version -}}
+{{- $has_mongo := .Vars.system.mongo.version -}}
 
-{{ if or ($has_postgresql) ($has_mariadb) ($has_mysql) ($has_redis) }}
+{{ if or ($has_postgresql) ($has_mariadb) ($has_mysql) ($has_redis) ($has_mongo) }}
 
 volumes:
     {{ if or ($has_postgresql) ($has_mariadb) ($has_mysql) -}}
@@ -17,6 +18,9 @@ volumes:
     {{- end }}
     {{ if $has_redis -}}
     redis-data:
+    {{- end }}
+    {{ if $has_mongo -}}
+    mongo-data:
     {{- end }}
 {{- end }}
 
@@ -122,5 +126,20 @@ services:
     ports: [80]
     environment:
       REDIS_1_HOST: 'redis'
+
+{{- end }}
+
+{{- if $has_mongo }}
+
+  mongo:
+    image: 'mongo:alpine'
+    ports: [27017]
+    environment:
+      MONGO_INITDB_DATABASE: 'app'
+      MONGO_INITDB_ROOT_USERNAME: 'app'
+      MONGO_INITDB_ROOT_PASSWORD: 'app'
+      TZ: {{ .Vars.system.timezone }}
+    volumes:
+      - mongo-data:/data
 
 {{- end }}

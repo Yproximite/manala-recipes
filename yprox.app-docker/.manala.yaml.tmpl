@@ -56,4 +56,9 @@ system:
         version: {{ .redis.version | toYaml }}
     {{- end }}
 
+    {{- if .mongo.version }}
+    mongo:
+        version: {{ .mongo.version | toYaml }}
+    {{- end }}
+
 {{- end }}
