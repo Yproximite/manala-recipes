@@ -44,3 +44,7 @@ system:
         version: ~
         # @schema {"type": ["object", "array"]}
         config: {}
+    mongo:
+        # @option {"label": "MongoDB version"}
+        # @schema {"enum": [null, *]}
+        version: ~

@@ -2,6 +2,7 @@
 {{- $has_mariadb := .Vars.system.mariadb.version -}}
 {{- $has_mysql := .Vars.system.mysql.version -}}
 {{- $has_redis := .Vars.system.redis.version -}}
+{{- $has_mongo := .Vars.system.mongo.version -}}
 
 # Relative root dir ("."|".."|"../.."|…)
 _ROOT_DIR := $(patsubst ./%,%,$(patsubst %/.manala/Makefile,%,./$(filter %.manala/Makefile,$(MAKEFILE_LIST))))
@@ -59,6 +60,7 @@ _up:
 	$(dc) up --detach
 	{{- if or ($has_postgresql) ($has_mariadb) ($has_mysql) }} database{{ end }}
 	{{- if $has_redis }} redis{{ end }}
+	{{- if $has_mongo }} mongo{{ end }}
 
 	{{ if or ($has_postgresql) ($has_mariadb) ($has_mysql) -}}
 	@$(call message_warning, Waiting for the database to be ready...)
