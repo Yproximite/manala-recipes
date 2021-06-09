@@ -141,6 +141,6 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: 'app'
       TZ: {{ .Vars.system.timezone }}
     volumes:
-      - mongo-data:/data
+      - mongo-data:/data/db
 
 {{- end }}
