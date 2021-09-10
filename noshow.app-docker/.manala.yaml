@@ -5,7 +5,6 @@ manala:
         - .manala/
         - docker/php/local/
         - docker-compose.yaml.tmpl
-        - php.ini.tmpl
 
 system:
     # @option {"label": "App name (in kebab-case)"}
