@@ -11,7 +11,7 @@ system:
     # @option {"label": "App name (in kebab-case)"}
     # @schema {"type": "string"}
     app_name: ~
-    # @schema {"type": [null, "string"]}
+    # @schema {"type": ["string"]}
     routing_rules: ~
     # @schema {"type": ["boolean"]}
     is_main_project: false

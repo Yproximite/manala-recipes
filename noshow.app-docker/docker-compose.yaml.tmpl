@@ -33,7 +33,7 @@ services:
             WWWGROUP: '${WWWGROUP}'
     image: sail-7.4/app
     labels:
-      - "traefik.http.routers.{{ .Vars.system.app_name }}.rule=Host(`noshow.local`) {{- if .Vars.system.routing_rules!=null }} && PathPrefix(`{{ .Vars.system.routing_rules }}`) {{- end}}"
+      - "traefik.http.routers.{{ .Vars.system.app_name }}.rule=Host(`noshow.local`) {{- if .Vars.system.routing_rules }} && PathPrefix(`{{ .Vars.system.routing_rules }}`) {{- end}}"
     extra_hosts:
         - 'host.docker.internal:host-gateway'
     ports:
