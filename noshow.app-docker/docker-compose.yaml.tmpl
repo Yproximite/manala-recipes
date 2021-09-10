@@ -24,34 +24,34 @@ services:
       - {{ $network_name }}
 {{- end }}
 
-	{{ .Vars.system.app_name }}:
-	  container_name: {{ .Vars.system.app_name }}
-	  build:
-	      context: ./docker/php/local
-	      dockerfile: Dockerfile
-	      args:
-	          WWWGROUP: '${WWWGROUP}'
-	  image: sail-7.4/app
-	  labels:
-	    - "traefik.http.routers.noshow-main.rule=Host(`noshow.local`) {{- if .Vars.system.routing_rules!=null }} && PathPrefix(`{{ .Vars.system.routing_rules }}`) {{- end}}"
-	  extra_hosts:
-	      - 'host.docker.internal:host-gateway'
-	  ports:
-	    - "80"
-	  environment:
-	      WWWUSER: '${WWWUSER}'
-	      LARAVEL_SAIL: 1
-	      XDEBUG_MODE: '${SAIL_XDEBUG_MODE:-off}'
-	      XDEBUG_CONFIG: '${SAIL_XDEBUG_CONFIG:-client_host=host.docker.internal}'
-	  volumes:
-	    - '.:/var/www/html'
-	  networks:
-	      - {{ $network_name }}
-	  {{- if or $has_mysql $has_redis }}
-	  depends_on:
-	      {{- if $has_mysql }}- {{ .Vars.system.app_name }}-mysql {{- end }}
-	      {{- if $has_redis }}- {{ .Vars.system.app_name }}-redis {{- end }}
-	  {{- end }}
+  {{ .Vars.system.app_name }}:
+    container_name: {{ .Vars.system.app_name }}
+    build:
+        context: ./docker/php/local
+        dockerfile: Dockerfile
+        args:
+            WWWGROUP: '${WWWGROUP}'
+    image: sail-7.4/app
+    labels:
+      - "traefik.http.routers.noshow-main.rule=Host(`noshow.local`) {{- if .Vars.system.routing_rules!=null }} && PathPrefix(`{{ .Vars.system.routing_rules }}`) {{- end}}"
+    extra_hosts:
+        - 'host.docker.internal:host-gateway'
+    ports:
+      - "80"
+    environment:
+      WWWUSER: '${WWWUSER}'
+      LARAVEL_SAIL: 1
+      XDEBUG_MODE: '${SAIL_XDEBUG_MODE:-off}'
+      XDEBUG_CONFIG: '${SAIL_XDEBUG_CONFIG:-client_host=host.docker.internal}'
+    volumes:
+      - '.:/var/www/html'
+    networks:
+        - {{ $network_name }}
+    {{- if or $has_mysql $has_redis }}
+    depends_on:
+        {{- if $has_mysql }}- {{ .Vars.system.app_name }}-mysql {{- end }}
+        {{- if $has_redis }}- {{ .Vars.system.app_name }}-redis {{- end }}
+  {{- end }}
 
 {{- if $has_mysql -}}
 {{- $mariadb := .Vars.system.mysql }}
