@@ -99,8 +99,14 @@ services:
 {{- end }}
 
 networks:
+{{- if .Vars.system.is_main_project }}
     {{ $network_name }}:
         driver: bridge
+{{ else }}
+	{{ $network_name }}:
+		external:
+			name: noshow-main_noshow-main-network
+{{ end }}
 
 {{ if or ($has_mysql) ($has_redis) }}
 volumes:

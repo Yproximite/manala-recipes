@@ -16,6 +16,7 @@ manala:
 system:
     app_name: {{ .app_name | toYaml }}
     routing_rules: {{ .routing_rules | toYaml }}
+    is_main_project: {{ .is_main_project | toYaml }}
     timezone: Etc/UTC
 
     php:

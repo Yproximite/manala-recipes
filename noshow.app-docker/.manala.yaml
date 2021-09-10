@@ -13,6 +13,8 @@ system:
     app_name: ~
     # @schema {"type": [null, "string"]}
     routing_rules: ~
+    # @schema {"type": ["boolean"]}
+    is_main_project: false
     # @schema {"type": ["string"], "pattern": "^[a-zA-Z]+/[a-zA-Z]+$"}
     timezone: Etc/UTC
     php:
