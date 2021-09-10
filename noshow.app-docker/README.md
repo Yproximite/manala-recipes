@@ -1,6 +1,6 @@
-# yProx - App (Docker)
+# NoShow - App (Docker)
 
-A [Manala recipe](https://github.com/manala/manala-recipes) for projects using the Symfony CLI, PHP, Node.js, PostgreSQL/MariaDB and Redis.
+A [Manala recipe](https://github.com/manala/manala-recipes) for projects using the Laravel Sail CLI, PHP, Node.js, MySQL and Redis.
 
 ---
 
@@ -8,13 +8,12 @@ A [Manala recipe](https://github.com/manala/manala-recipes) for projects using t
 
 * [manala](https://manala.github.io/manala/)
 * [Docker Desktop 2.2.0+](https://docs.docker.com/engine/install/)
-* Symfony CLI (with [local proxy support](https://symfony.com/doc/current/setup/symfony_server.html#setting-up-the-local-proxy)), PHP and Node.js must be installed by yourself on your machine
 
 ## Init
 
 ```
 $ cd [workspace]
-$ manala init -i yprox.app-docker --repository https://github.com/Yproximite/manala-recipes.git [project]
+$ manala init -i noshow.app-docker --repository https://github.com/Yproximite/manala-recipes.git [project]
 ```
 
 ## Configure PHP and Node.js versions
@@ -29,12 +28,10 @@ echo 14 > .nvmrc # Use Node.js 14
 ```
 
 Those files will be used by:
-- The Symfony CLI when using `symfony php` and `symfony composer` (eg: `symfony console cache:clear, `symfony composer install)
 - NVM when using `nvm use`
 - GitHub Actions, thanks to [the action `setup-environment`](#github-actions)
 
-**It is important to use `symfony php` and not `php` directly for running commands, thanks to its [Docker integration](https://symfony.com/doc/current/setup/symfony_server.html#docker-integration) 
-it automatically exposes environments variables from Docker (eg: `DATABASE_URL`, `REDIS_URL`, ...) to PHP.**
+**It is important to use `sail php` and not `php` directly for running commands, `sail` will wrap command to interact with Docker.**
 
 ## Quick start
 
@@ -43,7 +40,7 @@ In a shell terminal, change directory to your app, and run the following command
 ```shell
 cd /path/to/my/app
 manala init --repository https://github.com/Yproximite/manala-recipes.git
-Select the "yprox.app-docker" recipe
+Select the "noshow.app-docker" recipe
 ```
 
 Edit the `Makefile` at the root directory of your project and add the following lines at the beginning of the file:
@@ -126,7 +123,7 @@ Here is an example of a system configuration in `.manala.yaml`:
 
 system:
     app_name: your-app
-    postgresql:
+    mysql:
         version: 12
     redis:
         version: '*'
@@ -188,15 +185,8 @@ jobs:
             - run: make setup@integration
 
             # Check versions
-            - run: symfony php -v # PHP 8.0.3
+            - run: sail php -v # PHP 8.0.3
             - run: node -v # Node.js 14.16.0
-
-            # Run some tests... remember to use "symfony php" and not "php"
-            - run: symfony console cache:clear
-            - run: symfony console lint:twig templates
-            - run: symfony console lint:yaml config --parse-tags
-            - run: symfony console lint:xliff translations
-
 ```
 
 This is the code of local action `setup-environment`:
@@ -255,16 +245,16 @@ endef
 ## Install application
 install-app: composer-install init-db
 install-app:
-	$(symfony) console cache:clear
-	yarn install
-	yarn dev
+	$(sail) artisan cache:clear
+	$(sail) yarn install
+	$(sail) yarn dev
 
 ## Install application in integration environment
 install-app@integration: export APP_ENV=test
 install-app@integration:
-	$(composer) install --ansi --no-interaction --no-progress --prefer-dist --optimize-autoloader
-	yarn install --color=always --no-progress --frozen-lockfile
-	yarn dev
+	$(sail) composer install --ansi --no-interaction --no-progress --prefer-dist --optimize-autoloader
+	$(sail) yarn install --color=always --no-progress --frozen-lockfile
+	$(sail) yarn dev
 	$(MAKE) init-db@integration
 
 ################
@@ -272,42 +262,13 @@ install-app@integration:
 ################
 
 composer-install:
-	$(composer) install --ansi --no-interaction
+	$(sail) composer install --ansi --no-interaction
 
 init-db:
-	$(symfony) console doctrine:database:drop --force --if-exists --no-interaction
-	$(symfony) console doctrine:database:create --no-interaction
-	$(symfony) console doctrine:schema:update --force --no-interaction # to remove when we will use migrations
-	# $(symfony) console doctrine:migrations:migrate --no-interaction
-	$(symfony) console hautelook:fixtures:load --no-interaction
+	$(sail) artisan migrate:fresh --ansi --no-interaction
+	$(sail) artisan db:seed --ansi --no-interaction
 
-init-db@test: export APP_ENV=test
-init-db@test: init-db
-
-init-db@integration: export APP_ENV=test
 init-db@integration:
-	$(symfony) console doctrine:database:create --if-not-exists --no-interaction
-	$(symfony) console doctrine:schema:update --force --no-interaction # to remove when we will use migrations
-	# $(symfony) console doctrine:migrations:migrate --no-interaction
-	$(symfony) console hautelook:fixtures:load --no-interaction
-
-reload-db@test: export APP_ENV=test
-reload-db@test:
-	$(symfony) console hautelook:fixtures:load --purge-with-truncate --no-interaction
+	$(sail) artisan --env testing migrate:fresh --ansi --no-interaction
+	$(sail) artisan --env testing db:seed --ansi --no-interaction 
 ```
-
-### Tools
-
-#### Admin UI for database
-
-- If you use PostgreSQL, run `make run-phppgadmin` to run a local [PhpPgAdmin](https://github.com/phppgadmin/phppgadmin) instance
-- If using MariaDB, run `make run-phpmyadmin` to run a local [PhpMyAdmin](https://github.com/phpmyadmin/phpmyadmin) instance
-
-#### Admin UI for Redis
-
-Run `make run-phpredisadmin` to run a local [PhpRedisAdmin](https://github.com/erikdubbelboer/phpRedisAdmin) instance.
-
-#### Admin UI for Mongo
-
-You can use `Compass` a GUI for MongoDB, install it from here : [Compass](https://www.mongodb.com/try/download/compass).
-Once installed, retrieve Mongo Docker exposed port with `docker ps --filter "name=mongo"` and use this port in the connection string.
