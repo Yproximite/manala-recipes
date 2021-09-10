@@ -1,0 +1,44 @@
+manala:
+    description: NoShow - Generic application using Docker
+    template: .manala.yaml.tmpl
+    sync:
+        - .manala/
+        - docker/php/local/
+        - docker-compose.yaml.tmpl
+        - php.ini.tmpl
+
+system:
+    # @option {"label": "App name (in kebab-case)"}
+    # @schema {"type": "string"}
+    app_name: ~
+    # @schema {"type": [null, "string"]}
+    routing_rules: ~
+    # @schema {"type": ["string"], "pattern": "^[a-zA-Z]+/[a-zA-Z]+$"}
+    timezone: Etc/UTC
+    php:
+        # @schema {
+        #     "items": {"type": "object",
+        #         "additionalProperties": false,
+        #         "properties": {
+        #             "config": {"type": ["object", "string", "array"]}
+        #         }
+        #     }
+        # }
+        configs: []
+    traefik:
+        # @option {"label": "Traefik reverse proxy installation"}
+        # @schema {"enum": [null, "*"]}
+        version: ~
+    mysql:
+        # @option {"label": "MySQL version"}
+        # @schema {"enum": [null, 5.7, 8]}
+        version: ~
+        # @schema {"type": ["string", "null"]}
+        init: ~
+    redis:
+        # @option {"label": "Redis version"}
+        # @schema {"enum": [null, "*"]}
+        version: ~
+        # @schema {"type": ["object", "array"]}
+        config: {}
+

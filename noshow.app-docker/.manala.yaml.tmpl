@@ -1,0 +1,45 @@
+{{- with .Vars.system -}}
+
+####################################################################
+# !!! REMINDER !!!                                                 #
+# Don't forget to run `manala up` each time you update this file ! #
+####################################################################
+
+manala:
+    recipe: noshow.app-docker
+    repository: https://github.com/Yproximite/manala-recipes.git
+
+##########
+# System #
+##########
+
+system:
+    app_name: {{ .app_name | toYaml }}
+    routing_rules: {{ .routing_rules | toYaml }}
+    timezone: Etc/UTC
+
+    php:
+        configs:
+            # App
+            - config: |
+                ;App specific configuration
+
+	{{- if .traefik.version }}
+    traefik:
+        version: {{ .traefik.version | toYaml }}
+    {{- end }}
+
+    {{- if .mysql.version }}
+    mysql:
+        version: {{ .mysql.version | toYaml }}
+        init: |
+            CREATE DATABASE IF NOT EXISTS `app_test`;
+            GRANT ALL ON `app_test`.* TO 'app'@'%';
+    {{- end }}
+
+    {{- if .redis.version }}
+    redis:
+        version: {{ .redis.version | toYaml }}
+    {{- end }}
+
+{{- end }}
