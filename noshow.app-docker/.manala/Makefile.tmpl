@@ -33,7 +33,7 @@ setup: setup-laravel
 
 HELP += $(call help,setup@integration, Setup the integration environment)
 setup@integration: export APP_ENV=test
-setup@integration: setup-symfony@integration
+setup@integration: setup-laravel@integration
 	$(MAKE) _up
 	$(setup_integration)
 	@echo
@@ -41,6 +41,9 @@ setup@integration: setup-symfony@integration
 	@echo
 
 setup-laravel:
+	composer install
+
+setup-laravel@integration:
 	composer install
 
 _up:
