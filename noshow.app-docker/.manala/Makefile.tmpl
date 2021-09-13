@@ -41,13 +41,7 @@ setup@integration: setup-symfony@integration
 	@echo
 
 setup-laravel:
-	$(MAKE) setup-domain
-
-setup-laravel@integration:
-	$(symfony) server:ca:install
-
-setup-domain:
-	$(symfony) proxy:domain:attach {{ .Vars.system.app_name }}
+	composer install
 
 _up:
 	$(sail) up --detach

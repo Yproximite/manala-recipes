@@ -272,3 +272,9 @@ init-db@integration:
 	$(sail) artisan --env testing migrate:fresh --ansi --no-interaction
 	$(sail) artisan --env testing db:seed --ansi --no-interaction 
 ```
+
+### Tooling
+
+#### Dozzle
+The project embed a tool ([Dozzle](https://github.com/amir20/dozzle)) to monitor in realtime logs from any container.
+Once project has been launch (e.g. after `make up`) the tool is accessible at [http://localhost:9999](http://localhost:9999)
