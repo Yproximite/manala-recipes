@@ -10,9 +10,10 @@ system:
     # @option {"label": "App name (in kebab-case)"}
     # @schema {"type": "string"}
     app_name: ~
-    # @schema {"type": ["string"]}
+    # @option {"label": "Routing rules to use with Traefik (empty if none)"}
+    # @schema {"type": "string"}
     routing_rules: ~
-    # @schema {"type": ["boolean"]}
+    # @schema {"type": "boolean"}
     is_main_project: false
     # @schema {"type": ["string"], "pattern": "^[a-zA-Z]+/[a-zA-Z]+$"}
     timezone: Etc/UTC
