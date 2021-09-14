@@ -5,6 +5,7 @@ manala:
         - .manala/
         - docker/php/local/
         - docker-compose.yaml.tmpl
+        - sail
 
 system:
     # @option {"label": "App name (in kebab-case)"}
