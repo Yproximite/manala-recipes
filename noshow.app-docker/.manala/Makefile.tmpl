@@ -19,7 +19,7 @@ user := $(shell id -u)
 group := $(shell id -g)
 
 dc := USER_ID=$(user) GROUP_ID=$(group) docker-compose
-sail := ./vendor/bin/sail
+sail := ./sail
 
 HELP += $(call help_section, Environment)
 
