@@ -112,10 +112,11 @@ networks:
 {{- if .Vars.system.is_main_project }}
     {{ $network_name }}:
         driver: bridge
+        name: {{ $network_name }}
 {{ else }}
     {{ $network_name }}:
         external:
-            name: noshow-main_noshow-main-network
+            name: noshow-main-network
 {{ end -}}
 
 {{ if or ($has_mysql) ($has_redis) }}
@@ -123,9 +124,11 @@ volumes:
     {{ if ($has_mysql) -}}
     {{ .Vars.system.app_name }}-mysql-data:
         driver: local
+        name: {{ .Vars.system.app_name }}-mysql-data
     {{- end }}
     {{ if $has_redis -}}
     {{ .Vars.system.app_name }}-redis-data:
         driver: local
+        name: {{ .Vars.system.app_name }}-redis-data
     {{- end }}
 {{- end -}}
