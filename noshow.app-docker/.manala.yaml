@@ -18,6 +18,8 @@ system:
     is_main_project: false
     # @schema {"type": ["string"], "pattern": "^[a-zA-Z]+/[a-zA-Z]+$"}
     timezone: Etc/UTC
+    # @schema {"type": "string"}
+    app_domain: noshow.local
     php:
         # @schema {
         #     "items": {"type": "object",
