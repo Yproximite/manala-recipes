@@ -11,8 +11,8 @@ system:
     # @option {"label": "App name (in kebab-case)"}
     # @schema {"type": "string"}
     app_name: ~
-    # @option {"label": "Routing rules to use with Traefik (empty if none)"}
-    # @schema {"type": "string"}
+    # @option {"label": "Routing rules to use with Traefik (empty if none, false if non routed)"}
+    # @schema {"type": ["string", "boolean"]}
     routing_rules: ~
     # @schema {"type": "boolean"}
     is_main_project: false
