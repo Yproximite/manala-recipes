@@ -24,6 +24,7 @@ system:
             # App
             - config: |
                 ;App specific configuration
+        command: {{ .php.command | toYaml }}
 
 	{{- if .traefik.version }}
     traefik:
