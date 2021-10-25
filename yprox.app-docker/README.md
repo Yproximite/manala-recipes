@@ -7,7 +7,7 @@ A [Manala recipe](https://github.com/manala/manala-recipes) for projects using t
 ## Requirements
 
 * [manala](https://manala.github.io/manala/)
-* [Docker Desktop 2.2.0+](https://docs.docker.com/engine/install/)
+* [Docker Desktop 2.2.0+](https://docs.docker.com/engine/install/), with [Docker Compose](https://docs.docker.com/compose/install/) **or** [Docker Compose v2 plugin](https://docs.docker.com/compose/cli-command/#install-on-linux)
 * Symfony CLI (with [local proxy support](https://symfony.com/doc/current/setup/symfony_server.html#setting-up-the-local-proxy)), PHP and Node.js must be installed by yourself on your machine
 
 ## Init

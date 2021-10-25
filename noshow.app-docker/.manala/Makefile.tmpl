@@ -18,7 +18,7 @@ include $(_ROOT_DIR)/.manala/make/git.mk
 user := $(shell id -u)
 group := $(shell id -g)
 
-dc := USER_ID=$(user) GROUP_ID=$(group) docker-compose
+dc := USER_ID=$(user) GROUP_ID=$(group) $(shell docker compose > /dev/null 2>&1 && echo 'docker compose' || echo 'docker-compose')
 sail := ./sail
 
 HELP += $(call help_section, Environment)
