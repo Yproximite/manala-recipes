@@ -126,7 +126,7 @@ HELP += $(call help,run-kibana, Start a Kibana service)
 run-kibana:
 	$(eval ES_CID := $(shell $(dc) ps -q elasticsearch))
 	$(eval ES_CONTAINER := $(shell $(d) inspect -f '{{`{{.Name}}`}}' $(ES_CID) | cut -c2-))
-	(ES_PORT=$(ES_PORT) $(dc) up --detach kibana)
+	(ES_CONTAINER=$(ES_CONTAINER) $(dc) up --detach kibana)
 	@echo
 	@$(call message_success, You can now open http://`$(dc) port kibana 5601` to access Kibana)
 	@echo{{- end }}
