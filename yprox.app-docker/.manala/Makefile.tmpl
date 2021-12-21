@@ -22,6 +22,7 @@ include $(_ROOT_DIR)/.manala/make/git.mk
 user := $(shell id -u)
 group := $(shell id -g)
 
+d := USER_ID=$(user) GROUP_ID=$(group) docker
 dc := USER_ID=$(user) GROUP_ID=$(group) $(shell docker compose > /dev/null 2>&1 && echo 'docker compose' || echo 'docker-compose')
 symfony := symfony
 php := $(symfony) php
@@ -62,7 +63,7 @@ _up:
 	{{- if or ($has_postgresql) ($has_mariadb) ($has_mysql) }} database{{ end }}
 	{{- if $has_redis }} redis{{ end }}
 	{{- if $has_mongo }} mongo{{ end }}
-	{{- if $has_elastic }} elasticsearch {{ end }}
+	{{- if $has_elastic }} elasticsearch{{ end }}
 
 	{{ if or ($has_postgresql) ($has_mariadb) ($has_mysql) -}}
 	@$(call message_warning, Waiting for the database to be ready...)
@@ -123,7 +124,9 @@ run-phpredisadmin:
 {{ if $has_elastic -}}
 HELP += $(call help,run-kibana, Start a Kibana service)
 run-kibana:
-	$(dc) up --detach kibana
+	$(eval ES_CID := $(shell $(dc) ps -q elasticsearch))
+	$(eval ES_CONTAINER := $(shell $(d) inspect -f '{{`{{.Name}}`}}' $(ES_CID) | cut -c2-))
+	(ES_PORT=$(ES_PORT) $(dc) up --detach kibana)
 	@echo
 	@$(call message_success, You can now open http://`$(dc) port kibana 5601` to access Kibana)
 	@echo{{- end }}

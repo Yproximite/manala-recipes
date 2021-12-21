@@ -150,9 +150,10 @@ services:
 {{- end }}
 
 {{- if $has_elastic }}
+{{- $elastic := .Vars.system.elasticsearch }}
 
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.16.2
+    image: docker.elastic.co/elasticsearch/elasticsearch:{{ $elastic.version }}
     environment:
       - node.name=elasticsearch
       - cluster.name=es-docker-cluster
@@ -165,14 +166,13 @@ services:
         hard: -1
     volumes:
       - elastic-data:/usr/share/elasticsearch/data
-    ports:
-      - "9200:9200"
+    ports: [9200]
 
   kibana:
-    image: docker.elastic.co/kibana/kibana:7.16.2
+    image: docker.elastic.co/kibana/kibana:{{ $elastic.version }}
     ports: [5601]
     environment:
-      ELASTICSEARCH_URL: http://elasticsearch:9200
-      ELASTICSEARCH_HOSTS: '["http://elasticsearch:9200"]'
+      ELASTICSEARCH_URL: http://${ES_CONTAINER}:9200
+      ELASTICSEARCH_HOSTS: '["http://${ES_CONTAINER}:9200"]'
 
 {{- end }}

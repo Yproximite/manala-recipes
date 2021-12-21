@@ -50,5 +50,5 @@ system:
         version: ~
     elasticsearch:
         # @option {"label": "ElasticSearch version"}
-        # @schema {"enum": [null, "*"]}
+        # @schema {"enum": [null, "7.16.2"]}
         version: ~
