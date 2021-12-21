@@ -48,3 +48,7 @@ system:
         # @option {"label": "MongoDB version"}
         # @schema {"enum": [null, "3.6", "4"]}
         version: ~
+    elasticsearch:
+        # @option {"label": "ElasticSearch version"}
+        # @schema {"enum": [null, "*"]}
+        version: ~

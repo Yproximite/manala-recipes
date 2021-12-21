@@ -3,6 +3,7 @@
 {{- $has_mysql := .Vars.system.mysql.version -}}
 {{- $has_redis := .Vars.system.redis.version -}}
 {{- $has_mongo := .Vars.system.mongo.version -}}
+{{- $has_elastic := .Vars.system.elasticsearch.version -}}
 
 # Relative root dir ("."|".."|"../.."|…)
 _ROOT_DIR := $(patsubst ./%,%,$(patsubst %/.manala/Makefile,%,./$(filter %.manala/Makefile,$(MAKEFILE_LIST))))
@@ -61,6 +62,7 @@ _up:
 	{{- if or ($has_postgresql) ($has_mariadb) ($has_mysql) }} database{{ end }}
 	{{- if $has_redis }} redis{{ end }}
 	{{- if $has_mongo }} mongo{{ end }}
+	{{- if $has_elastic }} elasticsearch {{ end }}
 
 	{{ if or ($has_postgresql) ($has_mariadb) ($has_mysql) -}}
 	@$(call message_warning, Waiting for the database to be ready...)
@@ -116,6 +118,14 @@ run-phpredisadmin:
 	$(dc) up --detach phpredisadmin
 	@echo
 	@$(call message_success, You can now open http://`$(dc) port phpredisadmin 80` to access PhpRedisAdmin)
+	@echo{{- end }}
+
+{{ if $has_elastic -}}
+HELP += $(call help,run-kibana, Start a Kibana service)
+run-kibana:
+	$(dc) up --detach kibana
+	@echo
+	@$(call message_success, You can now open http://`$(dc) port kibana 5601` to access Kibana)
 	@echo{{- end }}
 
 HELP += $(call help_section, Project)
