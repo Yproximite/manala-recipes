@@ -52,3 +52,5 @@ system:
         # @option {"label": "ElasticSearch version"}
         # @schema {"enum": [null, "6.8.22", "7.16.2"]}
         version: ~
+        # @schema {"type": ["array"]}
+        plugins: []

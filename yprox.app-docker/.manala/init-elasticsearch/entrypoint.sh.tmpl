@@ -1,0 +1,18 @@
+{{- if .Vars.system.elasticsearch.plugins -}}
+#!/bin/bash
+set -e
+
+# install plugins
+{{- range $i, $plugin := .Vars.system.elasticsearch.plugins }}
+/usr/share/elasticsearch/bin/elasticsearch-plugin list | grep -q {{ $plugin }} || yes | /usr/share/elasticsearch/bin/elasticsearch-plugin install {{ $plugin }}
+{{- end }}
+
+# run entrypoint
+{{- if hasPrefix "6." .Vars.system.elasticsearch.version }}
+{{- $es_entrypoint := "/usr/local/bin/docker-entrypoint.sh" }}
+{{ $es_entrypoint }} "${@}"
+{{- else if hasPrefix "7." .Vars.system.elasticsearch.version }}
+{{- $es_entrypoint := "/bin/tini -- /usr/local/bin/docker-entrypoint.sh" }}
+{{ $es_entrypoint }} "${@}"
+{{- end }}
+{{- end -}}

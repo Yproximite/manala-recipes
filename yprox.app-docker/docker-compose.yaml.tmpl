@@ -151,9 +151,13 @@ services:
 
 {{- if $has_elastic }}
 {{- $elastic := .Vars.system.elasticsearch }}
+{{- $has_plugins := .Vars.system.elasticsearch.plugins }}
 
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:{{ $elastic.version }}
+    {{- if $has_plugins }}
+    entrypoint: /init-elasticsearch/entrypoint.sh
+    {{- end }}
     environment:
       - node.name=elasticsearch
       - cluster.name=es-docker-cluster
@@ -166,6 +170,9 @@ services:
         hard: -1
     volumes:
       - elastic-data:/usr/share/elasticsearch/data
+      {{- if $has_plugins }}
+      - ./.manala/init-elasticsearch:/init-elasticsearch
+      {{- end }}
     ports: [9200]
 
   kibana:
