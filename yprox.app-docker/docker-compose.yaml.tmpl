@@ -9,18 +9,22 @@ version: '3.6'
 {{- $has_mysql := .Vars.system.mysql.version -}}
 {{- $has_redis := .Vars.system.redis.version -}}
 {{- $has_mongo := .Vars.system.mongo.version -}}
+{{- $has_elastic := .Vars.system.elasticsearch.version -}}
 
-{{ if or ($has_postgresql) ($has_mariadb) ($has_mysql) ($has_redis) ($has_mongo) }}
+{{- if or ($has_postgresql) ($has_mariadb) ($has_mysql) ($has_redis) ($has_mongo) ($has_elastic) }}
 
 volumes:
-    {{ if or ($has_postgresql) ($has_mariadb) ($has_mysql) -}}
+    {{- if or ($has_postgresql) ($has_mariadb) ($has_mysql) }}
     db-data:
     {{- end }}
-    {{ if $has_redis -}}
+    {{- if $has_redis }}
     redis-data:
     {{- end }}
-    {{ if $has_mongo -}}
+    {{- if $has_mongo }}
     mongo-data:
+    {{- end }}
+    {{- if $has_elastic }}
+    elastic-data:
     {{- end }}
 {{- end }}
 
@@ -142,5 +146,40 @@ services:
       TZ: {{ .Vars.system.timezone }}
     volumes:
       - mongo-data:/data/db
+
+{{- end }}
+
+{{- if $has_elastic }}
+{{- $elastic := .Vars.system.elasticsearch }}
+{{- $has_plugins := .Vars.system.elasticsearch.plugins }}
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:{{ $elastic.version }}
+    {{- if $has_plugins }}
+    entrypoint: /init-elasticsearch/entrypoint.sh
+    {{- end }}
+    environment:
+      - node.name=elasticsearch
+      - cluster.name=es-docker-cluster
+      - cluster.initial_master_nodes=elasticsearch
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - elastic-data:/usr/share/elasticsearch/data
+      {{- if $has_plugins }}
+      - ./.manala/init-elasticsearch:/init-elasticsearch
+      {{- end }}
+    ports: [9200]
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:{{ $elastic.version }}
+    ports: [5601]
+    environment:
+      ELASTICSEARCH_URL: http://${ES_CONTAINER}:9200
+      ELASTICSEARCH_HOSTS: '["http://${ES_CONTAINER}:9200"]'
 
 {{- end }}

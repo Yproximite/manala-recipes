@@ -61,4 +61,9 @@ system:
         version: {{ .mongo.version | toYaml }}
     {{- end }}
 
+    {{- if .elasticsearch.version }}
+    elasticsearch:
+        version: {{ .elasticsearch.version | toYaml }}
+    {{- end }}
+
 {{- end }}

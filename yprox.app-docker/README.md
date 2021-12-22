@@ -296,6 +296,31 @@ reload-db@test:
 	$(symfony) console hautelook:fixtures:load --purge-with-truncate --no-interaction
 ```
 
+### ElasticSearch usage
+
+#### System configuration
+> __ElasticSearch require some configuration in order start.__ 
+
+You have to increase the `vm.max_map_count` up to `262144` either by running : `sysctl -w vm.max_map_count=262144` or by updating `/etc/sysctl.conf`.
+Setting value with `sysctl` command will not persist after a reboot.
+
+#### Plugins
+You can install any plugin you need by providing them in the `plugins` field.
+```yaml
+# .manala.yml
+
+system:
+  app_name: your-app
+  
+  elascticsearch:
+    version: 6.22.8
+    plugins:
+      - a-plugin
+      - b-plugin 
+```
+> Since all elasticsearch data are stored in a persistent volume, if you remove a plugin from this list and just re-run a `make up` the plugin will not be removed.
+> In order to do so, you have to delete the volume (the hard way) or manually remove the plugin in the container itself with `./bin/elasticsearch-plugin remove <plugin>`
+
 ### Tools
 
 #### Admin UI for database
@@ -311,3 +336,7 @@ Run `make run-phpredisadmin` to run a local [PhpRedisAdmin](https://github.com/e
 
 You can use `Compass` a GUI for MongoDB, install it from here : [Compass](https://www.mongodb.com/try/download/compass).
 Once installed, retrieve Mongo Docker exposed port with `docker ps --filter "name=mongo"` and use this port in the connection string.
+
+#### Kibana for ElasticSearch
+
+Run `make run-kibana` to run a local [Kibana](https://github.com/elastic/kibana) instance.
