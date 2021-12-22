@@ -311,3 +311,7 @@ Run `make run-phpredisadmin` to run a local [PhpRedisAdmin](https://github.com/e
 
 You can use `Compass` a GUI for MongoDB, install it from here : [Compass](https://www.mongodb.com/try/download/compass).
 Once installed, retrieve Mongo Docker exposed port with `docker ps --filter "name=mongo"` and use this port in the connection string.
+
+#### Kibana for ElasticSearch
+
+Run `make run-kibana` to run a local [Kibana](https://github.com/elastic/kibana) instance.
