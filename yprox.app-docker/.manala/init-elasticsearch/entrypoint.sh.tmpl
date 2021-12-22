@@ -9,10 +9,8 @@ set -e
 
 # run entrypoint
 {{- if hasPrefix "6." .Vars.system.elasticsearch.version }}
-{{- $es_entrypoint := "/usr/local/bin/docker-entrypoint.sh" }}
-{{ $es_entrypoint }} "${@}"
+/usr/local/bin/docker-entrypoint.sh "${@}"
 {{- else if hasPrefix "7." .Vars.system.elasticsearch.version }}
-{{- $es_entrypoint := "/bin/tini -- /usr/local/bin/docker-entrypoint.sh" }}
-{{ $es_entrypoint }} "${@}"
+/bin/tini -- /usr/local/bin/docker-entrypoint.sh "${@}"
 {{- end }}
 {{- end -}}
