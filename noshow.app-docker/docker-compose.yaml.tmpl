@@ -40,7 +40,7 @@ services:
         dockerfile: Dockerfile
         args:
             WWWGROUP: '${WWWGROUP}'
-    image: sail-7.4/app
+    image: sail-{{ .Vars.system.php.version }}/app
     {{- if kindIs "string" .Vars.system.routing_rules }}
     labels:
       - "traefik.http.routers.{{ .Vars.system.app_name }}.rule={{ .Vars.system.routing_rules }}"

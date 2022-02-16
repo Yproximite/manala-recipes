@@ -25,6 +25,7 @@ system:
             - config: |
                 ;App specific configuration
         command: {{ .php.command | toYaml }}
+        version: {{ .php.version | toYaml }}
 
 	{{- if .traefik.version }}
     traefik:

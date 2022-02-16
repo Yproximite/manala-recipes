@@ -3,7 +3,7 @@
 ##################################################################
 FROM ubuntu:21.04
 
-LABEL maintainer="Taylor Otwell"
+LABEL maintainer="Guillaume Marmorat"
 
 ARG WWWGROUP
 
