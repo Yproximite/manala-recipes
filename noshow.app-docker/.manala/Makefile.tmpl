@@ -75,3 +75,10 @@ destroy: halt
 	@echo
 
 HELP += $(call help_section, Project)
+
+.PHONY: ide-helper@phpdoc
+HELP += $(call help,ide-helper@phpdoc, Generate phpdoc helper for IDE)
+ide-helper@phpdoc:
+	$(sail) artisan clear-compiled
+	$(sail) artisan ide-helper:generate
+	$(sail) artisan ide-helper:models --write-mixin --reset
