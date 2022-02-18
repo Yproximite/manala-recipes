@@ -32,7 +32,7 @@ setup: setup-laravel
 	@echo
 
 HELP += $(call help,setup@integration, Setup the integration environment)
-setup@integration: export APP_ENV=test
+setup@integration: export APP_ENV=testing
 setup@integration: setup-laravel@integration
 	$(MAKE) _up
 	$(setup_integration)

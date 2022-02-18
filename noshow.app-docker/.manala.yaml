@@ -3,7 +3,7 @@ manala:
     template: .manala.yaml.tmpl
     sync:
         - .manala/
-        - docker/php/local/
+        - docker/local/
         - docker-compose.yaml.tmpl
         - sail
 
