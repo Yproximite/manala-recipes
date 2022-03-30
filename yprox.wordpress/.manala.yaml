@@ -1,0 +1,32 @@
+manala:
+    description: yProximite - WordPress projects using Docker
+    template: .manala.yaml.tmpl
+    sync:
+        - .docker/
+        - .dockerignore
+        - docker-compose.yaml.tmpl
+        - Procfile.tmpl
+        - .env.example.tmpl
+
+system:
+    # @option {"label": "App name (in kebab-case)"}
+    # @schema {"type": "string"}
+    app_name: ~
+    # @schema {"type": ["string"], "pattern": "^[a-zA-Z]+/[a-zA-Z]+$"}
+    timezone: Etc/UTC
+    php:
+        # @option {"label": "PHP version"}
+        # @schema {"enum": [7.4]}
+        version: 7.4
+        # @schema {"type": ["array"]}
+        extensions: []
+    redis:
+        # @option {"label": "Redis version"}
+        # @schema {"enum": [null, "*"]}
+        version: ~
+        # @schema {"type": ["object", "array"]}
+        config: {}
+    run:
+        # @schema {"type": ["string", "null"]}
+        postdeploy: ~
+
