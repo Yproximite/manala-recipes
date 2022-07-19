@@ -92,6 +92,19 @@ if [ $# -gt 0 ]; then
             sail_is_not_running
         fi
 
+    elif [ "$1" == "rector" ]; then
+        shift 1
+
+        if [ "$EXEC" == "yes" ]; then
+            [[ $CI == "true" ]] && DC_TTY="-T" || DC_TTY=""
+
+            docker-compose exec $DC_TTY \
+                "$APP_SERVICE" \
+                ./vendor/bin/rector "$@"
+        else
+            sail_is_not_running
+        fi
+
     # Pass unknown commands to the original "sail" script..
     else
         ./vendor/bin/sail "$@"
