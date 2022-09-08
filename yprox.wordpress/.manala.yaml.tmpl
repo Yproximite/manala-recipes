@@ -1,0 +1,32 @@
+{{- with .Vars.system -}}
+
+####################################################################
+# !!! REMINDER !!!                                                 #
+# Don't forget to run `manala up` each time you update this file ! #
+####################################################################
+
+manala:
+    recipe: yprox.wordpress
+    repository: https://github.com/Yproximite/manala-recipes.git
+
+##########
+# System #
+##########
+
+system:
+    app_name: {{ .app_name | toYaml }}
+    timezone: Etc/UTC
+
+    php:
+        version: {{ .php.version | toYaml }}
+        extensions: {{ .php.extensions | toYaml }}
+
+    run:
+        postdeploy: {{ .run.postdeploy | toYaml }}
+
+    {{- if .redis.version }}
+    redis:
+        version: {{ .redis.version | toYaml }}
+        config: {{ .redis.config | toYaml }}
+    {{- end }}
+{{- end }}
