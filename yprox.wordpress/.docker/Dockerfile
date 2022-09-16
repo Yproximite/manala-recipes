@@ -31,4 +31,5 @@ FROM base as production
 
 COPY --from=builder /var/www/html /var/www/html
 
-RUN chmod u+w /var/www/html/web/app/uploads
+RUN chmod u+w /var/www/html/web/app/uploads && \
+    chown -R www-data:www-data ./
