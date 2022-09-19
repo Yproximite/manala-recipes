@@ -4,6 +4,7 @@ manala:
     sync:
         - .docker/
         - .github/workflows/cd.yml.tmpl
+        - .github/workflows/manala_sync.yml.tmpl
         - .dockerignore
         - docker-compose.yaml.tmpl
         - Procfile.tmpl
