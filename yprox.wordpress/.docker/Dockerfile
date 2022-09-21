@@ -1,5 +1,8 @@
 FROM rg.fr-par.scw.cloud/yproximite/wordpress-base:7.4 as base
 
+ARG PHP_INI_OPCACHE_ENABLE=1
+ENV PHP_INI_OPCACHE_ENABLE PHP_INI_OPCACHE_ENABLE
+
 COPY .docker/nginx.d /etc/nginx/conf.d/
 COPY .docker/fpm.d /usr/local/etc/php-fpm.d/
 COPY .docker/php.d /usr/local/etc/php/conf.d/

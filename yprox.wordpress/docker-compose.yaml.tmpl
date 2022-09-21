@@ -10,6 +10,8 @@ services:
       context: .
       dockerfile: .docker/Dockerfile
       target: base
+      args:
+        PHP_INI_OPCACHE_ENABLE: 0
     container_name: wordpress-{{ .Vars.system.app_name }}-web
     labels:
       - "ycli.host={{ .Vars.system.app_name }}.wordpress.vm"
