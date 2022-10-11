@@ -14,18 +14,15 @@ ARG COMPOSER_AUTH
 
 COPY . .
 
-# Install node
-COPY --from=node:10-alpine /usr/lib /usr/lib
-COPY --from=node:10-alpine /usr/local/share /usr/local/share
-COPY --from=node:10-alpine /usr/local/lib /usr/local/lib
-COPY --from=node:10-alpine /usr/local/include /usr/local/include
-COPY --from=node:10-alpine /usr/local/bin /usr/local/bin
-
 # Install composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-RUN apk add --no-cache --virtual .build-deps \
-        yarn \
+# Install Node & Build
+RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash \
+    && export NVM_DIR="$HOME/.nvm" \
+    && [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" \
+    && nvm install 10 && nvm use 10 \
+    && npm install --global yarn \
     && yarn && yarn build \
     && rm -rf node_modules \
     && composer install
