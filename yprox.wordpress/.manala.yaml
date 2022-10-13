@@ -3,6 +3,7 @@ manala:
     template: .manala.yaml.tmpl
     sync:
         - .docker/
+        - .github/workflows/ci.yml
         - .github/workflows/cd.yml.tmpl
         - .github/workflows/manala_sync.yml.tmpl
         - .dockerignore
