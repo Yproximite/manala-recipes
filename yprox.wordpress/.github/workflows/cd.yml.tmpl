@@ -38,6 +38,9 @@ jobs:
         run: echo "--install.production false" > .yarnrc
         shell: bash
 
+      - id: epoch
+        run: echo "::set-output name=epoch::$(date +%s)"
+
       - name: Build and push
         uses: docker/build-push-action@v2
         with:
@@ -45,7 +48,7 @@ jobs:
           file: .docker/Dockerfile
           push: true
           pull: true
-          tags: rg.fr-par.scw.cloud/yproximite/{{ .Vars.system.app_name }}:{{"${{ github.sha }}"}}
+          tags: rg.fr-par.scw.cloud/yproximite/{{ .Vars.system.app_name }}:{{"${{ github.sha }}-${{ steps.epoch.outputs.epoch }}"}}
           cache-from: type=gha
           cache-to: type=gha,mode=max
           build-args: |
@@ -57,4 +60,4 @@ jobs:
           token: {{"${{ secrets.GH_ROLLOUT_TOKEN }}"}}
           repository: Yproximite/SystemK8s
           event-type: rollout
-          client-payload: '{"application": "wordpress", "service": "{{ .Vars.system.app_name }}", "environment": "",  "tag": "{{"${{ github.sha }}"}}"}'
+          client-payload: '{"application": "wordpress", "service": "{{ .Vars.system.app_name }}", "environment": "",  "tag": "{{"${{ github.sha }}-${{ steps.epoch.outputs.epoch }}"}}"}'
