@@ -13,4 +13,4 @@ jobs:
     if: {{"${{ github.ref == 'refs/heads/master' }}"}}
     uses: Yproximite/actions/.github/workflows/manala_synchronize.yml@master
     secrets:
-      token: ${{ secrets.GH_MANALA_SYNC_TOKEN }}
+      token: {{"${{ secrets.GH_MANALA_SYNC_TOKEN }}"}}
