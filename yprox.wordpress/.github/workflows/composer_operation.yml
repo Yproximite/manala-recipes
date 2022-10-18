@@ -1,0 +1,30 @@
+name: Manala Sync
+
+on:
+  workflow_dispatch:
+    inputs:
+      operation:
+        description: The operation to apply. Must be in "update, require"
+        required: true
+        type: choice
+        options:
+          - update
+          - require
+      package:
+        description: The packages concerned by the operation. Must be specified if "require" operation is set.
+        required: false
+        type: string
+        default: ''
+  repository_dispatch:
+    types: [synchronize]
+
+env:
+  TZ: UTC
+
+jobs:
+  synchronize:
+    if: {{"${{ github.ref == 'refs/heads/master' }}"}}
+    uses: Yproximite/actions/.github/workflows/composer_operations.yml@master
+    with:
+      operation: ${{ github.event.client_payload.operation || github.event.inputs.operation }}
+      package: ${{ github.event.client_payload.package || github.event.inputs.package || "" }}
