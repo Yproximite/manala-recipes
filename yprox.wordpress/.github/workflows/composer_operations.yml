@@ -1,4 +1,4 @@
-name: Manala Sync
+name: Composer Operations
 
 on:
   workflow_dispatch:
