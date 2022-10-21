@@ -1,8 +1,23 @@
 name: CI
+
 on:
   push:
+    branches:
+      - master
     paths-ignore:
       - ".github/**"
+  pull_request:
+    paths-ignore:
+      - ".github/**"
+    types:
+      - opened
+      - reopened
+      - synchronize
+      - labeled
+
+concurrency:
+  cancel-in-progress: true
+  group: ci-${{ github.ref }}
 
 env:
   TZ: UTC
@@ -81,7 +96,23 @@ jobs:
       - run: yarn build
         if: env.package_exist == 'true'
 
-  auto_merge:
+  auto_merge_composer_operation:
+    runs-on: ubuntu-latest
+    needs: [ php, javascript ]
+    if: ${{ github.actor == 'yprox' && contains(github.event.pull_request.labels.*.name, 'bifrost:composer_operation') }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Merge pull requests
+        uses: pascalgn/automerge-action@v0.15.5
+        env:
+          GITHUB_TOKEN: "${{ secrets.GH_MANALA_SYNC_TOKEN }}"
+          MERGE_LABELS: "bifrost:composer_operation"
+          MERGE_DELETE_BRANCH: "true"
+          MERGE_ERROR_FAIL: "true"
+
+  auto_merge_dependabot:
     runs-on: ubuntu-latest
     needs: [php, javascript]
     if: ${{ github.actor == 'dependabot[bot]' }}
