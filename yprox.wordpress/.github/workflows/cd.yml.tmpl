@@ -13,7 +13,7 @@ env:
 
 jobs:
   deploy:
-    if: {{"${{ github.ref == 'refs/heads/master' && github.event.workflow_run.conclusion == 'success' }}"}}
+    if: {{"${{ github.ref == 'refs/heads/master' && (github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success') }}"}}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
