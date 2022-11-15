@@ -1,0 +1,48 @@
+{{- with .Vars.system -}}
+
+####################################################################
+# !!! REMINDER !!!                                                 #
+# Don't forget to run `manala up` each time you update this file ! #
+####################################################################
+
+manala:
+    recipe: yprox.sylius
+    repository: https://github.com/Yproximite/manala-recipes.git
+
+##########
+# System #
+##########
+
+system:
+    app_name: {{ .app_name | toYaml }}
+    timezone: Etc/UTC
+
+    php:
+        configs:
+            # XDebug
+            - config: |
+                ; Comment/uncomment the following lines to disable/enable XDebug
+                ;zend_extension=xdebug.so
+                ;xdebug.remote_enable=1
+                ;xdebug.remote_autostart=1
+
+            # App
+            - config: |
+                ;App specific configuration
+
+    run:
+        postdeploy: {{ .run.postdeploy | toYaml }}
+
+    mysql:
+        version: {{ .mysql.version | toYaml }}
+        init: |
+            CREATE DATABASE IF NOT EXISTS `app_test`;
+            GRANT ALL ON `app_test`.* TO 'app'@'%';
+
+    redis:
+        version: {{ .redis.version | toYaml }}
+
+    elasticsearch:
+        version: {{ .elasticsearch.version | toYaml }}
+
+{{- end }}

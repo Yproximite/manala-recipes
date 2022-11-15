@@ -1,0 +1,5 @@
+web-nginx: nginx
+web-fpm: php-fpm -F
+{{- with .Vars.system.run.postdeploy }}
+postdeploy: {{ . }}
+{{- end }}
