@@ -16,19 +16,19 @@ jobs:
     if: {{"${{ github.ref == 'refs/heads/master' && (github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success') }}"}}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Set up Docker Context for Buildx
         id: buildx-context
         run: docker context create builders
 
       - name: setup Docker Buildx
-        uses: docker/setup-buildx-action@v1
+        uses: docker/setup-buildx-action@v2
         with:
           endpoint: builders
 
       - name: login to Github Container Registry
-        uses: docker/login-action@v1
+        uses: docker/login-action@v2
         with:
           registry: rg.fr-par.scw.cloud
           username: nologin
@@ -39,10 +39,10 @@ jobs:
         shell: bash
 
       - id: epoch
-        run: echo "::set-output name=epoch::$(date +%s)"
+        run: echo "epoch=$(date +%s)" >> $GITHUB_OUTPUT
 
       - name: Build and push
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v3
         with:
           context: .
           file: .docker/Dockerfile
@@ -55,7 +55,7 @@ jobs:
             COMPOSER_AUTH={{"${{ secrets.COMPOSER_AUTH }}"}}
 
       - name: rollout new version
-        uses: peter-evans/repository-dispatch@v1
+        uses: peter-evans/repository-dispatch@v2
         with:
           token: {{"${{ secrets.GH_ROLLOUT_TOKEN }}"}}
           repository: Yproximite/SystemK8s
