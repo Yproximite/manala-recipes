@@ -25,7 +25,7 @@ env:
   NODE_VERSION: 10
 
   COMPOSER_ALLOW_SUPERUSER: '1' # https://getcomposer.org/doc/03-cli.md#composer-allow-superuser
-  COMPOSER_AUTH: '{"http-basic":{"repo.packagist.com":{"username":"token","password":"${{ secrets.PACKAGIST_AUTH_TOKEN }}"}}}'
+  COMPOSER_AUTH: '${{ secrets.COMPOSER_AUTH }}'
 
 jobs:
   php:
