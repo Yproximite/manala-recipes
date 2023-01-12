@@ -22,20 +22,17 @@ concurrency:
 env:
   TZ: UTC
   PHP_VERSION: 7.4
-  NODE_VERSION: 10
+  NODE_VERSION: 14
 
   COMPOSER_ALLOW_SUPERUSER: '1' # https://getcomposer.org/doc/03-cli.md#composer-allow-superuser
   COMPOSER_AUTH: '{"http-basic":{"repo.packagist.com":{"username":"token","password":"${{ secrets.PACKAGIST_AUTH_TOKEN }}"}}}'
 
 jobs:
-  php:
+  checks:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-
-      - name: Check composer.json existence
-        run: echo "composer_exist=$(test -f composer.json && echo 'true' || echo 'false')" >> $GITHUB_ENV
 
       - name: Install PHP
         uses: shivammathur/setup-php@v2
@@ -45,41 +42,23 @@ jobs:
           extensions: ctype, iconv, intl
           ini-values: date.timezone=${{ env.TZ }}, memory_limit=-1, session.gc_probability=0
           tools: composer:v2, cs2pr, symfony
-        if: env.composer_exist == 'true'
 
       - run: symfony composer validate
-        if: env.composer_exist == 'true'
 
       - run: symfony security:check
-        if: env.composer_exist == 'true'
 
       - uses: ramsey/composer-install@v2
         with:
-          composer-options: "--prefer-dist --optimize-autoloader"
-        if: env.composer_exist == 'true'
-
-      - run: $(composer config bin-dir)/php-cs-fixer fix -v --dry-run --using-cache=no
-        if: env.composer_exist == 'true'
-
-  javascript:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-
-      - name: Check package.json existence
-        run: echo "package_exist=$(test -f package.json && echo 'true' || echo 'false')" >> $GITHUB_ENV
+          composer-options: "--prefer-dist --optimize-autoloader --no-scripts"
 
       - name: Install Node.js
         uses: actions/setup-node@v1
         with:
           node-version: ${{ env.NODE_VERSION }}
-        if: env.package_exist == 'true'
 
       - name: Get Yarn cache directory
         id: yarn-cache-dir
         run: echo "::set-output name=dir::$(yarn cache dir)"
-        if: env.package_exist == 'true'
 
       - name: Cache Yarn dependencies
         uses: actions/cache@v2
@@ -88,20 +67,14 @@ jobs:
           key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-yarn-
-        if: env.package_exist == 'true'
 
       - run: yarn install
-        if: env.package_exist == 'true'
-
       - run: yarn lint
-        if: env.package_exist == 'true'
-
       - run: yarn build
-        if: env.package_exist == 'true'
 
   auto_merge_composer_operation:
     runs-on: ubuntu-latest
-    needs: [ php, javascript ]
+    needs: [ checks ]
     if: ${{ github.actor == 'yprox' && contains(github.event.pull_request.labels.*.name, 'bifrost:composer_operation') }}
     steps:
       - name: Checkout
@@ -117,7 +90,7 @@ jobs:
 
   auto_merge_dependabot:
     runs-on: ubuntu-latest
-    needs: [php, javascript]
+    needs: [checks]
     if: ${{ github.actor == 'dependabot[bot]' }}
     steps:
       - name: Checkout

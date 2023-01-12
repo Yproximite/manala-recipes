@@ -11,7 +11,7 @@ volumes:
 
 services:
   database:
-    image: 'mysql:{{ $mysql.version }}'
+    image: 'mysql:{{ .Vars.system.mysql.version }}'
     ports: [3306]
     environment:
       MYSQL_USER: 'app'
@@ -37,14 +37,16 @@ services:
       - redis-data:/data
 
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:{{ $elastic.version }}
+    image: docker.elastic.co/elasticsearch/elasticsearch:{{ .Vars.system.elasticsearch.version }}
     {{- if .Vars.system.elasticsearch.plugins }}
     entrypoint: /init-elasticsearch/entrypoint.sh
     {{- end }}
     environment:
       - node.name=elasticsearch
       - cluster.name=es-docker-cluster
+      {{- if ne .Vars.system.elasticsearch.version "6.8.22" }}
       - cluster.initial_master_nodes=elasticsearch
+      {{- end }}
       - bootstrap.memory_lock=true
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
     ulimits:
@@ -59,7 +61,7 @@ services:
     ports: [9200]
 
   kibana:
-    image: docker.elastic.co/kibana/kibana:{{ $elastic.version }}
+    image: docker.elastic.co/kibana/kibana:{{ .Vars.system.elasticsearch.version }}
     ports: [5601]
     environment:
       ELASTICSEARCH_URL: http://${ES_CONTAINER}:9200

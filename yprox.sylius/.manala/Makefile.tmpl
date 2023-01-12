@@ -56,20 +56,14 @@ setup-domain:
 	$(symfony) proxy:domain:attach {{ .Vars.system.app_name }}
 
 _up:
-	$(dc) up --detach
-	{{- if or ($has_postgresql) ($has_mariadb) ($has_mysql) }} database{{ end }}
-	{{- if $has_redis }} redis{{ end }}
-	{{- if $has_mongo }} mongo{{ end }}
-	{{- if $has_elastic }} elasticsearch{{ end }}
+	$(dc) up --detach database redis elasticsearch
 
-	{{ if or ($has_postgresql) ($has_mariadb) ($has_mysql) -}}
 	@$(call message_warning, Waiting for the database to be ready...)
 	@until docker inspect -f {{ "{{.State.Health.Status}}" }} `$(dc) ps -q database` | grep -q "healthy"; do \
       $(call message_warning, Waiting...); \
       sleep 1; \
 	done
 	@$(call message_success, The database is ready!)
-	{{- end }}
 
 HELP += $(call help,up,                Start the development environment)
 up:
@@ -92,33 +86,6 @@ destroy: halt
 
 HELP += $(call help_section, Development tools)
 
-{{- if $has_postgresql -}}
-HELP += $(call help,run-phppgadmin,    Start a PhpPgAdmin web interface)
-run-phppgadmin:
-	$(dc) up --detach phppgadmin
-	@echo
-	@$(call message_success, You can now open http://`$(dc) port phppgadmin 8080` to access PhpPgAdmin)
-	@echo
-{{- end }}
-
-{{ if or ($has_mariadb) ($has_mysql) -}}
-HELP += $(call help,run-phpmyadmin,    Start a PhpMyAdmin web interface)
-run-phpmyadmin:
-	$(dc) up --detach phpmyadmin
-	@echo
-	@$(call message_success, You can now open http://`$(dc) port phpmyadmin 80` to access PhpMyAdmin)
-	@echo
-{{- end }}
-
-{{ if $has_redis -}}
-HELP += $(call help,run-phpredisadmin, Start a PhpRedisAdmin web interface)
-run-phpredisadmin:
-	$(dc) up --detach phpredisadmin
-	@echo
-	@$(call message_success, You can now open http://`$(dc) port phpredisadmin 80` to access PhpRedisAdmin)
-	@echo{{- end }}
-
-{{ if $has_elastic -}}
 HELP += $(call help,run-kibana, Start a Kibana service)
 run-kibana:
 	$(eval ES_CID := $(shell $(dc) ps -q elasticsearch))
@@ -126,6 +93,6 @@ run-kibana:
 	(ES_CONTAINER=$(ES_CONTAINER) $(dc) up --detach kibana)
 	@echo
 	@$(call message_success, You can now open http://`$(dc) port kibana 5601` to access Kibana)
-	@echo{{- end }}
+	@echo
 
 HELP += $(call help_section, Project)
