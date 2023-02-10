@@ -10,7 +10,7 @@ env:
 
 jobs:
   synchronize:
-    if: {{"${{ github.ref == 'refs/heads/master' }}"}}
-    uses: Yproximite/actions/.github/workflows/manala_synchronize.yml@master
+    if: {{"${{ github.ref == 'refs/heads/main' }}"}}
+    uses: Yproximite/actions/.github/workflows/manala_synchronize.yml@main
     secrets:
       token: {{"${{ secrets.GH_MANALA_SYNC_TOKEN }}"}}

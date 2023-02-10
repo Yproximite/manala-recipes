@@ -24,8 +24,8 @@ env:
 
 jobs:
   synchronize:
-    if: ${{ github.ref == 'refs/heads/master' }}
-    uses: Yproximite/actions/.github/workflows/composer_operations.yml@master
+    if: ${{ github.ref == 'refs/heads/main' }}
+    uses: Yproximite/actions/.github/workflows/composer_operations.yml@main
     with:
       operation: "${{ github.event.client_payload.operation || github.event.inputs.operation }}"
       package: "${{ github.event.client_payload.package || github.event.inputs.package }}"
