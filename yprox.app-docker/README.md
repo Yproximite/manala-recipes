@@ -14,7 +14,7 @@ A [Manala recipe](https://github.com/manala/manala-recipes) for projects using t
 
 ```
 $ cd [workspace]
-$ manala init -i yprox.app-docker --repository https://github.com/Yproximite/manala-recipes [project]
+$ manala init -i yprox.app-docker --repository https://github.com/Yproximite/manala-recipes.git [project]
 ```
 
 ## Configure PHP and Node.js versions
