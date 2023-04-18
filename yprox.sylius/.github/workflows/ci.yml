@@ -21,7 +21,7 @@ concurrency:
 
 env:
   TZ: UTC
-  PHP_VERSION: 7.4
+  PHP_VERSION: 8.1
   NODE_VERSION: 14
 
   COMPOSER_ALLOW_SUPERUSER: '1' # https://getcomposer.org/doc/03-cli.md#composer-allow-superuser

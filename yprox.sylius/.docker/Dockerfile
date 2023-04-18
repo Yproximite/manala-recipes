@@ -1,4 +1,4 @@
-FROM rg.fr-par.scw.cloud/yproximite/sylius-base:7.4 as base
+FROM rg.fr-par.scw.cloud/yproximite/sylius-base:8.1 as base
 
 COPY .docker/nginx.d /etc/nginx/conf.d/
 COPY .docker/fpm.d /usr/local/etc/php-fpm.d/

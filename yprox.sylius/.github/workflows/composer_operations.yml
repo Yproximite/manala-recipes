@@ -25,10 +25,11 @@ env:
 jobs:
   synchronize:
     if: ${{ github.ref == 'refs/heads/main' }}
-    uses: Yproximite/actions/.github/workflows/composer_operations.yml@main
+    uses: Yproximite/actions/.github/workflows/composer_operations.yml@master
     with:
       operation: "${{ github.event.client_payload.operation || github.event.inputs.operation }}"
       package: "${{ github.event.client_payload.package || github.event.inputs.package }}"
+      options: "--no-scripts"
     secrets:
       token: ${{ secrets.GH_MANALA_SYNC_TOKEN }}
       composer_auth: ${{ secrets.COMPOSER_AUTH }}
