@@ -1,5 +1,7 @@
 web-nginx: nginx
 web-fpm: php-fpm -F
+worker-main: ./bin/console messenger:consume main --limit 10
+worker-promotion: ./bin/console messenger:consume catalog_promotion_removal --limit 10
 {{- with .Vars.system.run.postdeploy }}
 postdeploy: {{ . }}
 {{- end }}
