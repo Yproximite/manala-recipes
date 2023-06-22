@@ -28,6 +28,14 @@ services:
       timeout: 5s
       retries: 5
 
+  phpmyadmin:
+    image: phpmyadmin
+    ports: [80]
+    environment:
+      PMA_HOST: 'database'
+      PMA_USER: 'app'
+      PMA_PASSWORD: 'app'
+
   redis:
     image: 'redis:alpine'
     ports: [6379]
