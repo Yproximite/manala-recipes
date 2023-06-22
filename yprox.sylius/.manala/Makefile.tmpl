@@ -86,6 +86,20 @@ destroy: halt
 
 HELP += $(call help_section, Development tools)
 
+HELP += $(call help,run-phpmyadmin,    Start a PhpMyAdmin web interface)
+run-phpmyadmin:
+	$(dc) up --detach phpmyadmin
+	@echo
+	@$(call message_success, You can now open http://`$(dc) port phpmyadmin 80` to access PhpMyAdmin)
+	@echo
+
+HELP += $(call help,run-phpredisadmin, Start a PhpRedisAdmin web interface)
+run-phpredisadmin:
+	$(dc) up --detach phpredisadmin
+	@echo
+	@$(call message_success, You can now open http://`$(dc) port phpredisadmin 80` to access PhpRedisAdmin)
+	@echo
+
 HELP += $(call help,run-kibana, Start a Kibana service)
 run-kibana:
 	$(eval ES_CID := $(shell $(dc) ps -q elasticsearch))
