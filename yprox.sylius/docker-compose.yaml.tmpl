@@ -44,6 +44,12 @@ services:
     volumes:
       - redis-data:/data
 
+  phpredisadmin:
+    image: erikdubbelboer/phpredisadmin
+    ports: [80]
+    environment:
+      REDIS_1_HOST: 'redis'
+
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:{{ .Vars.system.elasticsearch.version }}
     {{- if .Vars.system.elasticsearch.plugins }}
