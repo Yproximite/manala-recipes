@@ -29,6 +29,7 @@ jobs:
     with:
       operation: "${{ github.event.client_payload.operation || github.event.inputs.operation }}"
       package: "${{ github.event.client_payload.package || github.event.inputs.package }}"
+      update_options: "-W"
     secrets:
       token: ${{ secrets.GH_MANALA_SYNC_TOKEN }}
       composer_auth: ${{ secrets.COMPOSER_AUTH }}

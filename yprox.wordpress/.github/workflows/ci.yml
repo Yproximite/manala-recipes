@@ -32,7 +32,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Check composer.json existence
         run: echo "composer_exist=$(test -f composer.json && echo 'true' || echo 'false')" >> $GITHUB_ENV
@@ -50,6 +50,13 @@ jobs:
       - run: composer validate
         if: env.composer_exist == 'true'
 
+      - uses: actions/cache@v3
+        with:
+          path: ${{ env.COMPOSER_CACHE_DIR }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: ${{ runner.os }}-composer-
+        if: env.composer_exist == 'true'
+
       - uses: ramsey/composer-install@v2
         with:
           composer-options: "--prefer-dist --optimize-autoloader"
@@ -62,7 +69,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Check package.json existence
         run: echo "package_exist=$(test -f package.json && echo 'true' || echo 'false')" >> $GITHUB_ENV
@@ -71,20 +78,7 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: ${{ env.NODE_VERSION }}
-        if: env.package_exist == 'true'
-
-      - name: Get Yarn cache directory
-        id: yarn-cache-dir
-        run: echo "dir=$(yarn cache dir)" >> $GITHUB_OUTPUT
-        if: env.package_exist == 'true'
-
-      - name: Cache Yarn dependencies
-        uses: actions/cache@v3
-        with:
-          path: ${{ steps.yarn-cache-dir.outputs.dir }}
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
+          cache: 'yarn'
         if: env.package_exist == 'true'
 
       - run: yarn install
@@ -102,7 +96,7 @@ jobs:
     if: ${{ github.actor == 'yprox' && contains(github.event.pull_request.labels.*.name, 'bifrost:composer_operation') }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Merge pull requests
         uses: pascalgn/automerge-action@v0.15.5
@@ -118,7 +112,7 @@ jobs:
     if: ${{ github.actor == 'dependabot[bot]' }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - uses: ahmadnassri/action-dependabot-auto-merge@v2
         with:
