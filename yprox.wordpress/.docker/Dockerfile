@@ -7,25 +7,32 @@ COPY .docker/nginx.d /etc/nginx/conf.d/
 COPY .docker/fpm.d /usr/local/etc/php-fpm.d/
 COPY .docker/php.d /usr/local/etc/php/conf.d/
 
-FROM base as builder
+FROM base as development
+
+ARG NODE_VERSION=10.24.1
 
 WORKDIR /var/www/html
-ARG COMPOSER_AUTH
-
-COPY . .
 
 # Install composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Install Node & Build
-RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash \
-    && export NVM_DIR="$HOME/.nvm" \
-    && [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" \
-    && nvm install 10 && nvm use 10 \
-    && npm install --global yarn \
-    && yarn && yarn build \
-    && rm -rf node_modules \
-    && composer install
+# Install Node & Yarn
+ENV NVM_DIR=/root/.nvm
+RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.5/install.sh | bash \
+    && \. "$NVM_DIR/nvm.sh" \
+    && nvm install ${NODE_VERSION}  \
+    && nvm use v${NODE_VERSION} \
+    && npm install --global yarn
+
+FROM development as builder
+
+COPY . .
+
+RUN yarn && yarn build \
+    && rm -rf node_modules
+
+ARG COMPOSER_AUTH
+RUN composer install
 
 FROM base as production
 

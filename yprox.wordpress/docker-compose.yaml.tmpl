@@ -9,7 +9,7 @@ services:
     build:
       context: .
       dockerfile: .docker/Dockerfile
-      target: base
+      target: development
       args:
         PHP_INI_OPCACHE_ENABLE: 0
     container_name: wordpress-{{ .Vars.system.app_name }}-web
@@ -27,6 +27,7 @@ services:
       PORT: 8080
     volumes:
       - ./:/var/www/html
+      - ${HOME}/.composer/auth.json:/root/.composer/auth.json:ro
     networks:
       - wordpress-network
     depends_on:
