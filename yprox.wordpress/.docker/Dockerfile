@@ -28,7 +28,8 @@ FROM development as builder
 
 COPY . .
 
-RUN yarn && yarn build \
+RUN \. "$NVM_DIR/nvm.sh" \
+    && yarn && yarn build \
     && rm -rf node_modules
 
 ARG COMPOSER_AUTH
