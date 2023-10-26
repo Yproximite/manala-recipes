@@ -53,6 +53,27 @@ services:
       timeout: 5s
       retries: 5
 
+  {{- if .Vars.system.redis.version }}
+
+  wordpress-{{ .Vars.system.app_name }}-redis:
+      image: redis/redis-stack
+      container_name: wordpress-{{ .Vars.system.app_name }}-redis
+      ports:
+        - "6379"
+        - "8001"
+      networks:
+        - wordpress-network
+      environment:
+        TZ: {{ .Vars.system.timezone }}
+      env_file:
+        - .env
+      healthcheck:
+        test: redis-cli ping
+        interval: 10s
+        timeout: 5s
+        retries: 5
+  {{- end }}
+
 volumes:
   wordpress-{{ .Vars.system.app_name }}-database-data:
 
