@@ -18,6 +18,7 @@ jobs:
   synchronize:
     uses: Yproximite/actions/.github/workflows/manala_synchronize.yml@master
     with:
+      default_branch: "${{ github.event.repository.default_branch }}"
       target_branch: "${{ github.event.client_payload.target_branch || github.event.inputs.target_branch }}"
     secrets:
       token: ${{ secrets.GH_MANALA_SYNC_TOKEN }}
