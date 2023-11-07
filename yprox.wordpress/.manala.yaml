@@ -6,7 +6,7 @@ manala:
         - .github/workflows/ci.yml
         - .github/workflows/cd.yml.tmpl
         - .github/workflows/composer_operations.yml
-        - .github/workflows/manala_sync.yml.tmpl
+        - .github/workflows/manala_sync.yml
         - .dockerignore
         - docker-compose.yaml.tmpl
         - Procfile.tmpl
