@@ -21,8 +21,6 @@ concurrency:
 
 env:
   TZ: UTC
-  PHP_VERSION: 8.1
-  NODE_VERSION: 14
 
   COMPOSER_ALLOW_SUPERUSER: '1' # https://getcomposer.org/doc/03-cli.md#composer-allow-superuser
   COMPOSER_AUTH: '{"http-basic":{"repo.packagist.com":{"username":"token","password":"${{ secrets.PACKAGIST_AUTH_TOKEN }}"}}}'
@@ -32,7 +30,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
+
+      - uses: ./.github/actions/setup-environment
 
       - name: Install PHP
         uses: shivammathur/setup-php@v2
@@ -43,34 +43,36 @@ jobs:
           ini-values: date.timezone=${{ env.TZ }}, memory_limit=-1, session.gc_probability=0
           tools: composer:v2, cs2pr, symfony
 
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'yarn'
+
+      - uses: actions/cache@v3
+        with:
+          path: ${{ env.COMPOSER_CACHE_DIR }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: ${{ runner.os }}-composer-
+
       - run: symfony composer validate
 
       - run: symfony security:check
 
-      - uses: ramsey/composer-install@v2
-        with:
-          composer-options: "--prefer-dist --optimize-autoloader --no-scripts"
+      - run: make setup@integration
 
-      - name: Install Node.js
-        uses: actions/setup-node@v1
-        with:
-          node-version: ${{ env.NODE_VERSION }}
+      - run: symfony console cache:clear --env=dev
 
-      - name: Get Yarn cache directory
-        id: yarn-cache-dir
-        run: echo "::set-output name=dir::$(yarn cache dir)"
+      - name: Run PHPStan
+        run: symfony php bin/phpstan --no-progress
 
-      - name: Cache Yarn dependencies
-        uses: actions/cache@v2
-        with:
-          path: ${{ steps.yarn-cache-dir.outputs.dir }}
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
+      - name: Validate database schema
+        run: symfony console doctrine:schema:validate --skip-mapping -e test_cached
 
-      - run: yarn install
-      - run: yarn lint
-      - run: yarn build
+      - name: Run PHPUnit
+        run: symfony php bin/phpunit --colors=always
+
+      - run: symfony php bin/php-cs-fixer fix --verbose --diff --dry-run
 
   auto_merge_composer_operation:
     runs-on: ubuntu-latest
@@ -78,7 +80,7 @@ jobs:
     if: ${{ github.actor == 'yprox' && contains(github.event.pull_request.labels.*.name, 'bifrost:composer_operation') }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Merge pull requests
         uses: pascalgn/automerge-action@v0.15.5
@@ -94,7 +96,7 @@ jobs:
     if: ${{ github.actor == 'dependabot[bot]' }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - uses: ahmadnassri/action-dependabot-auto-merge@v2
         with:
