@@ -3,7 +3,6 @@ web-fpm: php-fpm -F
 worker-main: ./bin/console messenger:consume main --limit 10
 worker-promotion: ./bin/console messenger:consume catalog_promotion_removal --limit 10
 worker-product-import-medias: ./bin/console messenger:consume product_import_medias --limit 10
-worker-paypal-payment-complete: ./bin/console sylius:pay-pal-plugin:complete-payments
 {{- with .Vars.system.run.postdeploy }}
 postdeploy: {{ . }}
 {{- end }}
