@@ -8,6 +8,16 @@ on:
         default: ""
         type: string
         required: false
+      init:
+        required: false
+        description: Whether to run in init mode or not
+        type: boolean
+        default: false
+      project:
+        required: false
+        description: Paired with init mode it define the project name to be used
+        type: string
+        default: null
   repository_dispatch:
     types: [synchronize]
 
@@ -20,5 +30,7 @@ jobs:
     with:
       default_branch: "${{ github.event.repository.default_branch }}"
       target_branch: "${{ github.event.client_payload.target_branch || github.event.inputs.target_branch }}"
+      init: "${{ github.event.repository.init }}"
+      project: "${{ github.event.repository.project }}"
     secrets:
       token: ${{ secrets.GH_MANALA_SYNC_TOKEN }}
