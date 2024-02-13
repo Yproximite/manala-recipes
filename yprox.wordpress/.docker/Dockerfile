@@ -1,3 +1,6 @@
+ARG COMPOSER_VERSION=2.6
+FROM composer:${COMPOSER_VERSION} as composer-local
+
 FROM rg.fr-par.scw.cloud/yproximite/wordpress-base:7.4 as base
 
 ARG PHP_INI_OPCACHE_ENABLE=1
@@ -14,7 +17,7 @@ ARG NODE_VERSION=10.24.1
 WORKDIR /var/www/html
 
 # Install composer
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+COPY --from=composer-local /usr/bin/composer /usr/bin/composer
 
 # Install Node & Yarn
 ENV NVM_DIR=/root/.nvm
