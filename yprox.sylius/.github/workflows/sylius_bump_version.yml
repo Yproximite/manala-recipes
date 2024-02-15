@@ -1,0 +1,31 @@
+name: Sylius Bump Version
+
+on:
+  workflow_dispatch:
+    inputs:
+      composer:
+        description: Whether or not to run composer update for sylius core dependencies.
+        required: false
+        type: boolean
+        default: true
+      yarn:
+        description: Whether or not to run yarn update for sylius core dependencies.
+        required: false
+        type: boolean
+        default: true
+  repository_dispatch:
+    types: [sylius-bump-version]
+
+env:
+  TZ: UTC
+
+jobs:
+  synchronize:
+    if: ${{ github.ref == 'refs/heads/main' }}
+    uses: Yproximite/actions/.github/workflows/sylius_bump_version.yml@master
+    with:
+      composer: "${{ github.event.client_payload.composer || github.event.inputs.composer }}"
+      yarn: "${{ github.event.client_payload.yarn || github.event.inputs.yarn }}"
+    secrets:
+      token: ${{ secrets.GH_MANALA_SYNC_TOKEN }}
+      composer_auth: ${{ secrets.COMPOSER_AUTH }}
