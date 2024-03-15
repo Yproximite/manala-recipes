@@ -14,50 +14,10 @@ env:
 jobs:
   deploy:
     if: {{"${{ (github.ref == 'refs/heads/master' && github.event.workflow_run.conclusion == 'success' && vars.AUTODEPLOY == 'true') || github.event_name == 'workflow_dispatch' }}"}}
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Set up Docker Context for Buildx
-        id: buildx-context
-        run: docker context create builders
-
-      - name: setup Docker Buildx
-        uses: docker/setup-buildx-action@v2
-        with:
-          endpoint: builders
-
-      - name: login to Github Container Registry
-        uses: docker/login-action@v2
-        with:
-          registry: rg.fr-par.scw.cloud
-          username: nologin
-          password: {{"${{ secrets.SCW_CONTAINER_REGISTRY_TOKEN }}"}}
-
-      - name: force yarn to install all dependencies during build
-        run: echo "--install.production false" > .yarnrc
-        shell: bash
-
-      - id: epoch
-        run: echo "epoch=$(date +%s)" >> $GITHUB_OUTPUT
-
-      - name: Build and push
-        uses: docker/build-push-action@v3
-        with:
-          context: .
-          file: .docker/Dockerfile
-          push: true
-          pull: true
-          tags: rg.fr-par.scw.cloud/yproximite/{{ .Vars.system.app_name }}:{{"${{ github.sha }}-${{ steps.epoch.outputs.epoch }}"}}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-          build-args: |
-            COMPOSER_AUTH={{"${{ secrets.COMPOSER_AUTH }}"}}
-
-      - name: rollout new version
-        uses: peter-evans/repository-dispatch@v2
-        with:
-          token: {{"${{ secrets.GH_ROLLOUT_TOKEN }}"}}
-          repository: Yproximite/SystemK8s
-          event-type: rollout
-          client-payload: '{"application": "wordpress", "service": "{{ .Vars.system.app_name }}", "environment": "",  "tag": "{{"${{ github.sha }}-${{ steps.epoch.outputs.epoch }}"}}"}'
+    uses: Yproximite/actions/.github/workflows/wordpress_build.yml@master
+    with:
+      project: "{{ .Vars.system.app_name }}"
+    secrets:
+      registry_token: {{"${{ secrets.SCW_CONTAINER_REGISTRY_TOKEN }}"}}
+      rollout_token: {{"${{ secrets.GH_ROLLOUT_TOKEN }}"}}
+      composer_auth: {{"${{ secrets.COMPOSER_AUTH }}"}}
