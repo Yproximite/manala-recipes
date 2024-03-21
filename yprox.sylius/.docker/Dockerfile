@@ -12,6 +12,7 @@ ARG COMPOSER_AUTH
 COPY . .
 
 # Install composer
+ENV COMPOSER_ALLOW_SUPERUSER=1
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 RUN composer install --no-scripts
 
