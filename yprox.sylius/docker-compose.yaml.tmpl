@@ -8,6 +8,7 @@ volumes:
     db-data:
     redis-data:
     elastic-data:
+    minio-data:
 
 services:
   database:
@@ -80,3 +81,37 @@ services:
     environment:
       ELASTICSEARCH_URL: http://${ES_CONTAINER}:9200
       ELASTICSEARCH_HOSTS: '["http://${ES_CONTAINER}:9200"]'
+
+  minio:
+    image: quay.io/minio/minio
+    labels:
+      com.symfony.server.service-prefix: 'MINIO'
+    ports: [ "9000","9001" ]
+    environment:
+      MINIO_ROOT_USER: 'access_app'
+      MINIO_ROOT_PASSWORD: 'secret_app'
+    volumes:
+      - minio-data:/data
+    command:
+      - server
+      - /data
+      - --console-address
+      - "0.0.0.0:9001"
+    healthcheck:
+      test: [ "CMD", "mc", "ready", "local" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  createbuckets:
+    image: minio/mc
+    depends_on:
+      minio:
+        condition: service_healthy
+    entrypoint: >
+      /bin/sh -c "
+      /usr/bin/mc config host add local http://minio:9000 access_app secret_app;
+      /usr/bin/mc mb local/syl-{{ .Vars.system.app_name }};
+      /usr/bin/mc anonymous set public local/syl-{{ .Vars.system.app_name }};
+      exit 0;
+      "
