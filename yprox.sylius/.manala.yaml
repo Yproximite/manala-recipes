@@ -13,6 +13,7 @@ manala:
         - docker-compose.yaml.tmpl
         - Procfile.tmpl
         - .env.example.tmpl
+        - .nvmrc
 
 system:
     # @option {"label": "App name (in kebab-case)"}
