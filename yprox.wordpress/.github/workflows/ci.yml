@@ -99,7 +99,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Merge pull requests
-        uses: pascalgn/automerge-action@v0.16.3
+        uses: pascalgn/automerge-action@v0.16.4
         env:
           GITHUB_TOKEN: "${{ secrets.GH_MANALA_SYNC_TOKEN }}"
           MERGE_LABELS: "bifrost:composer_operation"
