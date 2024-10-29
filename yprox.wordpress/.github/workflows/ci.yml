@@ -50,14 +50,14 @@ jobs:
       - run: composer validate
         if: env.composer_exist == 'true'
 
-      - uses: actions/cache@v3
+      - uses: actions/cache@v4
         with:
           path: ${{ env.COMPOSER_CACHE_DIR }}
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
           restore-keys: ${{ runner.os }}-composer-
         if: env.composer_exist == 'true'
 
-      - uses: ramsey/composer-install@v2
+      - uses: ramsey/composer-install@v3
         with:
           composer-options: "--prefer-dist --optimize-autoloader"
         if: env.composer_exist == 'true'
@@ -75,7 +75,7 @@ jobs:
         run: echo "package_exist=$(test -f package.json && echo 'true' || echo 'false')" >> $GITHUB_ENV
 
       - name: Install Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'yarn'
