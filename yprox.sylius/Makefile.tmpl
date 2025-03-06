@@ -1,0 +1,92 @@
+.SILENT:
+.PHONY: build test
+
+-include .manala/Makefile
+
+# This function will be called at the end of "make setup"
+define setup
+	# For example:
+	$(MAKE) install-app
+endef
+
+# This function will be called at the end of "make setup@integration"
+define setup_integration
+	# For example:
+	$(MAKE) install-app@integration
+endef
+
+_SYLIUS_TEMPLATE_DIRECTORY := $(shell pwd)
+_WORKSPACE_DIRECTORY := $(shell dirname $(_SYLIUS_TEMPLATE_DIRECTORY))
+
+## App
+APP_DB_BACKUP_DIR=/tmp/{{ .app_name | toYaml }}
+
+###########
+# Install #
+###########
+
+## Install application
+install-app: composer-install init-db
+install-app:
+	$(composer) dump-autoload
+	mkdir -p $(_WORKSPACE_DIRECTORY)/{{ .app_name | toYaml }}/public/media/image
+	$(symfony) console cache:clear
+	yarn install
+# 	yarn --cwd ./vendor/yproximite/sylius-plugin run build
+	yarn run build
+
+install-app@test: export APP_ENV=test
+install-app@test: install-app
+
+install-app@integration: export APP_ENV=test_cached
+install-app@integration:
+	$(composer) install --ansi --no-interaction --no-progress --prefer-dist --optimize-autoloader
+	$(MAKE) init-db@integration
+	$(symfony) console cache:clear
+	yarn install
+	yarn run build
+
+################
+# Common tasks #
+################
+
+use-sylius-plugin-locally:
+	if ! [ -d "$(_WORKSPACE_DIRECTORY)/sylius-plugin" ]; \
+		then \
+  			echo "Error: $(_WORKSPACE_DIRECTORY)/sylius-plugin not found. Install Yproximite/sylius-plugin."; \
+  			exit 1; \
+	fi
+
+	$(composer) config --json repositories.yproximite/sylius-plugin '{"type": "path","url": "$(_WORKSPACE_DIRECTORY)/sylius-plugin","packagist.org": false,"options": {"symlink": true}}'
+	$(composer) require yproximite/sylius-plugin:@dev
+
+remove-sylius-plugin-locally:
+	git checkout -- composer.lock composer.json
+	$(composer) install
+
+composer-install:
+	$(composer) install --ansi --verbose --no-interaction
+
+init-db:
+	$(symfony) console doctrine:database:drop --force --if-exists --no-interaction
+	$(symfony) console doctrine:database:create --no-interaction
+	$(symfony) console doctrine:migrations:migrate --no-interaction
+	$(symfony) console sylius:fixtures:load custom_suite -n
+	$(symfony) console sylius:fixtures:load theme_starter_suite -n
+	$(symfony) console sylius:fixtures:load plugin_suite -n
+
+init-db@test: export APP_ENV=test
+init-db@test:
+	$(symfony) console doctrine:database:drop --force --if-exists --no-interaction
+	$(symfony) console doctrine:database:create --if-not-exists
+	$(symfony) console doctrine:schema:update --force
+	$(symfony) console sylius:fixtures:load custom_suite -n
+	$(symfony) console sylius:fixtures:load theme_starter_suite -n
+
+init-db@integration: export APP_ENV=test_cached
+init-db@integration:
+	$(symfony) console doctrine:database:drop --force --if-exists --no-interaction
+	$(symfony) console doctrine:database:create --no-interaction
+	$(symfony) console doctrine:migrations:migrate --no-interaction
+	$(symfony) console sylius:fixtures:load custom_suite -n
+	$(symfony) console sylius:fixtures:load theme_starter_suite -n
