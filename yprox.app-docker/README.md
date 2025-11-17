@@ -332,6 +332,10 @@ system:
 
 Run `make run-phpredisadmin` to run a local [PhpRedisAdmin](https://github.com/erikdubbelboer/phpRedisAdmin) instance.
 
+#### Admin UI for Mailpit
+
+Run `make run-mailpit` to get the local [Mailpit](https://github.com/axllent/mailpit) instance.
+
 #### Admin UI for Mongo
 
 You can use `Compass` a GUI for MongoDB, install it from here : [Compass](https://www.mongodb.com/try/download/compass).
