@@ -240,7 +240,7 @@ services:
       /bin/sh -c "
       /usr/bin/mc alias set local http://minio:9000 access_app secret_app;
       /usr/bin/mc mb local/{{ $minio.bucket_name }};
-      /usr/bin/mc anonymous set public local/{{ minio.bucket_name }};
+      /usr/bin/mc anonymous set public local/{{ $minio.bucket_name }};
       exit 0;
       "
 
