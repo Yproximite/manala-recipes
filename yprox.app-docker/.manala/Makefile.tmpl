@@ -130,7 +130,7 @@ HELP += $(call help,run-mailpit, Start a Mailpit web interface)
 run-mailpit:
 	$(dc) up --detach mailpit
 	@echo
-	@$(call message_success, You can now open http://`$(dc) port mailpit 80` to access Mailpit)
+	@$(call message_success, You can now open http://`$(dc) port mailpit 8025` to access Mailpit)
 	@echo{{- end }}
 
 {{ if $has_elastic -}}
