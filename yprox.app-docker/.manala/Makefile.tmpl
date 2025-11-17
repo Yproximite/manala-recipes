@@ -2,6 +2,7 @@
 {{- $has_mariadb := .Vars.system.mariadb.version -}}
 {{- $has_mysql := .Vars.system.mysql.version -}}
 {{- $has_redis := .Vars.system.redis.version -}}
+{{- $has_mailpit := .Vars.system.mailpit.version -}}
 {{- $has_mongo := .Vars.system.mongo.version -}}
 {{- $has_elastic := .Vars.system.elasticsearch.version -}}
 
@@ -62,6 +63,7 @@ _up:
 	$(dc) up --detach
 	{{- if or ($has_postgresql) ($has_mariadb) ($has_mysql) }} database{{ end }}
 	{{- if $has_redis }} redis{{ end }}
+	{{- if $has_mailpit }} mailpit{{ end }}
 	{{- if $has_mongo }} mongo{{ end }}
 	{{- if $has_elastic }} elasticsearch{{ end }}
 
@@ -119,6 +121,14 @@ run-phpredisadmin:
 	$(dc) up --detach phpredisadmin
 	@echo
 	@$(call message_success, You can now open http://`$(dc) port phpredisadmin 80` to access PhpRedisAdmin)
+	@echo{{- end }}
+
+{{ if $has_mailpit -}}
+HELP += $(call help,run-mailpit, Start a Mailpit web interface)
+run-mailpit:
+	$(dc) up --detach mailpit
+	@echo
+	@$(call message_success, You can now open http://`$(dc) port mailpit 80` to access Mailpit)
 	@echo{{- end }}
 
 {{ if $has_elastic -}}

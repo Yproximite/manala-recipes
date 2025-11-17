@@ -44,6 +44,10 @@ system:
         version: ~
         # @schema {"type": ["object", "array"]}
         config: {}
+    mailpit:
+        # @option {"label": "Mailpit version"}
+        # @schema {"enum": [null, "*"]}
+        version: ~
     mongo:
         # @option {"label": "MongoDB version"}
         # @schema {"enum": [null, "3.6", "4"]}
