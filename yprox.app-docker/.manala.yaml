@@ -58,3 +58,10 @@ system:
         version: ~
         # @schema {"type": ["array"]}
         plugins: []
+    minio:
+        # @option {"label": "Minio version"}
+        # @schema {"enum": [null, "*"]}
+        version: ~
+        # @option {"label": "Bucket name (in kebab-case)"}
+        # @schema {"type": "string"}
+        bucket_name: ~

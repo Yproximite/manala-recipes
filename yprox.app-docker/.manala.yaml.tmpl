@@ -71,4 +71,10 @@ system:
         version: {{ .elasticsearch.version | toYaml }}
     {{- end }}
 
+    {{- if .minio.version }}
+    minio:
+        version: {{ .minio.version | toYaml }}
+        bucket_name: {{ .minio.bucket_name | toYaml }}
+    {{- end }}
+
 {{- end }}
