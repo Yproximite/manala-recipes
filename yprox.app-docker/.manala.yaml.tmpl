@@ -56,6 +56,11 @@ system:
         version: {{ .redis.version | toYaml }}
     {{- end }}
 
+    {{- if .mailpit.version }}
+    mailpit:
+        version: {{ .mailpit.version | toYaml }}
+    {{- end }}
+
     {{- if .mongo.version }}
     mongo:
         version: {{ .mongo.version | toYaml }}
