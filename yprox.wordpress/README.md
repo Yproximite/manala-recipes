@@ -117,8 +117,7 @@ system:
 
 ### GitHub Actions
 
-Since this recipe generates a `docker-compose.yaml` file, it can 
-be used to provide a fully-fledged environnement according to your project needs on GitHub Actions.
+Since this recipe generates a `docker-compose.yaml` file, it can be used to provide a fully-fledged environnement according to your project needs on GitHub Actions.
 
 ```yaml
 name: CI
