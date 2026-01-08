@@ -1,7 +1,7 @@
 ARG COMPOSER_VERSION=2.6
 FROM composer:${COMPOSER_VERSION} as composer-local
 
-FROM rg.fr-par.scw.cloud/yproximite/wordpress-base:7.4 as base
+FROM rg.fr-par.scw.cloud/yproximite/wordpress-base:{{ .Vars.system.php.version }} as base
 
 ARG PHP_INI_OPCACHE_ENABLE=1
 ENV PHP_INI_OPCACHE_ENABLE PHP_INI_OPCACHE_ENABLE
