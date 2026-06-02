@@ -33,7 +33,7 @@ system:
         config: {}
     node:
         # @option {"label": "Node version"}
-        # @schema {"enum": [null,"10.24.1","18.20.8"]}
+        # @schema {"enum": [null,"10.24.1","18.20.8","20.20.0"]}
         version: 10.24.1
         # @schema {"type": ["array"]}
         extensions: []
