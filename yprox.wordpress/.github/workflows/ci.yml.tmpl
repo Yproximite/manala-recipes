@@ -22,7 +22,7 @@ concurrency:
 env:
   TZ: UTC
   PHP_VERSION: {{ .Vars.system.php.version }}
-  NODE_VERSION: 10
+  NODE_VERSION: {{ .Vars.system.node.version }}
   COMPOSER_CACHE_DIR: '~/.composer/cache'
   COMPOSER_ALLOW_SUPERUSER: '1' # https://getcomposer.org/doc/03-cli.md#composer-allow-superuser
   COMPOSER_AUTH: '{{"${{ secrets.COMPOSER_AUTH }}"}}'

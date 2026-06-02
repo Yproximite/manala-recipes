@@ -12,7 +12,7 @@ COPY .docker/php.d /usr/local/etc/php/conf.d/
 
 FROM base as development
 
-ARG NODE_VERSION=10.24.1
+ARG NODE_VERSION={{ .Vars.system.node.version }}
 
 WORKDIR /var/www/html
 

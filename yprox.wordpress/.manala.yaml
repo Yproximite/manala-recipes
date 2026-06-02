@@ -31,6 +31,12 @@ system:
         version: ~
         # @schema {"type": ["object", "array"]}
         config: {}
+    node:
+        # @option {"label": "Node version"}
+        # @schema {"enum": [null,"10.24.1","18.20.8"]}
+        version: 10.24.1
+        # @schema {"type": ["array"]}
+        extensions: []
     run:
         # @schema {"type": ["string", "null"]}
         postdeploy: ~
