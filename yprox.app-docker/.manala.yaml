@@ -36,7 +36,7 @@ system:
         init: ~
     postgresql:
         # @option {"label": "PostgreSQL version"}
-        # @schema {"enum": [null, 13, 12, 11, 10, 9.6]}
+        # @schema {"enum": [null, 18, 16, 14, 13, 12, 11, 10, 9.6]}
         version: ~
     redis:
         # @option {"label": "Redis version"}
@@ -63,5 +63,5 @@ system:
         # @schema {"enum": [null, "*"]}
         version: ~
         # @option {"label": "Bucket name (in kebab-case)"}
-        # @schema {"type": "string"}
+        # @schema {"type": ["string", "null"]}
         bucket_name: ~
