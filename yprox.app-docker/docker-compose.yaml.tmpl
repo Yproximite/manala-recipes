@@ -48,7 +48,18 @@ services:
       TZ: {{ .Vars.system.timezone }}
       PGTZ: {{ .Vars.system.timezone }}
     volumes:
+      {{- /*
+        From 18 on, the official image stores data under a major-version-specific
+        directory and refuses to start against a mount at /var/lib/postgresql/data:
+        "in 18+, these Docker images are configured to store database data in a
+        format which is compatible with pg_ctlcluster". The upstream advice is a
+        single mount one level up.
+      */}}
+      {{- if ge (float64 $postgresql.version) 18.0 }}
+      - db-data:/var/lib/postgresql
+      {{- else }}
       - db-data:/var/lib/postgresql/data
+      {{- end }}
     healthcheck:
       test: pg_isready
       interval: 10s
