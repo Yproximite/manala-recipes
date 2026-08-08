@@ -55,7 +55,11 @@ setup-symfony:
 	$(MAKE) setup-domain
 
 setup-symfony@integration:
-	$(symfony) server:ca:install
+	# The CA is installed in the system trust store, which is all "symfony serve"
+	# needs, even when no Firefox/Chrome NSS database is found. The CLI still exits
+	# non-zero in that case, which is the norm on a bare CI runner. Keep going, but
+	# let make report the ignored error so a real failure stays visible.
+	-$(symfony) server:ca:install
 
 setup-domain:
 	$(symfony) proxy:domain:attach {{ .Vars.system.app_name }}
