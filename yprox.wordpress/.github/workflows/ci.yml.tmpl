@@ -111,10 +111,58 @@ jobs:
     runs-on: ubuntu-latest
     needs: [php, javascript]
     if: {{"${{ github.actor == 'dependabot[bot]' }}"}}
+    permissions:
+      contents: write
+      pull-requests: write
+      security-events: read # required by "alert-lookup" below
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - uses: ahmadnassri/action-dependabot-auto-merge@v2
+      - name: Fetch Dependabot metadata
+        id: metadata
+        uses: dependabot/fetch-metadata@v3
         with:
-          github-token: {{"${{ secrets.ACTION_DEPENDABOT_AUTO_MERGE_TOKEN }}"}}
+          # Populates "ghsa-id", which tells a security fix apart from a
+          # regular version bump.
+          alert-lookup: true
+
+      # Development dependencies: any minor or patch.
+      # Production dependencies: security fixes only, minor or patch.
+      # Anything else (major, indirect dependencies) is merged by hand.
+      #
+      # Production is restricted because the composer "require" of a WordPress
+      # project holds the core and the plugins, which do not follow semver, and
+      # this CI only validates, lints and builds: nothing tests the site.
+      - name: Apply auto-merge policy
+        id: policy
+        env:
+          DEPENDENCY_TYPE: {{"${{ steps.metadata.outputs.dependency-type }}"}}
+          UPDATE_TYPE: {{"${{ steps.metadata.outputs.update-type }}"}}
+          GHSA_ID: {{"${{ steps.metadata.outputs.ghsa-id }}"}}
+        run: |
+          eligible=false
+
+          case "$UPDATE_TYPE" in
+              version-update:semver-minor | version-update:semver-patch)
+                  case "$DEPENDENCY_TYPE" in
+                      direct:development)
+                          eligible=true
+                          ;;
+                      direct:production)
+                          if [ -n "$GHSA_ID" ]; then eligible=true; fi
+                          ;;
+                  esac
+                  ;;
+          esac
+
+          echo "eligible=$eligible" >>"$GITHUB_OUTPUT"
+          echo "$DEPENDENCY_TYPE / $UPDATE_TYPE / security=${GHSA_ID:-no} -> auto-merge: $eligible"
+
+      # The PAT is required to approve: the Actions GITHUB_TOKEN is not
+      # allowed to approve a pull request.
+      - name: Approve and enable auto-merge
+        if: {{"${{ steps.policy.outputs.eligible == 'true' }}"}}
+        env:
+          GH_TOKEN: {{"${{ secrets.ACTION_DEPENDABOT_AUTO_MERGE_TOKEN }}"}}
+          PR_URL: {{"${{ github.event.pull_request.html_url }}"}}
+        run: |
+          gh pr review --approve "$PR_URL"
+          gh pr merge --auto --squash "$PR_URL"
