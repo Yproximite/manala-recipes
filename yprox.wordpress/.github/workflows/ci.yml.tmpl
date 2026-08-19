@@ -123,6 +123,9 @@ jobs:
           # Populates "ghsa-id", which tells a security fix apart from a
           # regular version bump.
           alert-lookup: true
+          # "alert-lookup" queries the repository security alerts, which the
+          # default token cannot read on a Dependabot pull request.
+          github-token: {{"${{ secrets.ACTION_DEPENDABOT_AUTO_MERGE_TOKEN }}"}}
 
       # Development dependencies: any minor or patch.
       # Production dependencies: security fixes only, minor or patch.
