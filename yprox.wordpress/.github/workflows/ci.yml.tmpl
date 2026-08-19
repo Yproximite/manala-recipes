@@ -114,29 +114,67 @@ jobs:
     permissions:
       contents: write
       pull-requests: write
-      security-events: read # required by "alert-lookup" below
     steps:
       - name: Fetch Dependabot metadata
         id: metadata
         uses: dependabot/fetch-metadata@v3
-        with:
-          # Populates "ghsa-id", which tells a security fix apart from a
-          # regular version bump.
-          alert-lookup: true
+
+      # The action's own "alert-lookup" cannot be used: it matches alerts whose
+      # "vulnerableRequirements" reads "= <version>", while the API returns the
+      # bare version for lockfile alerts, so it never finds anything. Querying
+      # the alerts here also lets us require that the target version actually
+      # reaches the patched one, which "alert-lookup" never checks.
+      - name: Look up security advisories
+        id: advisory
+        env:
+          GH_TOKEN: {{"${{ secrets.ACTION_DEPENDABOT_AUTO_MERGE_TOKEN }}"}}
+          DEPENDENCY_NAMES: {{"${{ steps.metadata.outputs.dependency-names }}"}}
+          PREVIOUS_VERSION: {{"${{ steps.metadata.outputs.previous-version }}"}}
+          NEW_VERSION: {{"${{ steps.metadata.outputs.new-version }}"}}
+        run: |
+          alerts=$(gh api graphql \
+              -F owner="${GITHUB_REPOSITORY%/*}" -F name="${GITHUB_REPOSITORY#*/}" \
+              -f query='
+                query($owner: String!, $name: String!) {
+                  repository(owner: $owner, name: $name) {
+                    vulnerabilityAlerts(first: 100, states: OPEN) { nodes {
+                      vulnerableRequirements
+                      securityVulnerability { package { name } firstPatchedVersion { identifier } }
+                      securityAdvisory { ghsaId severity } } } } }' \
+            | jq -r --arg names "$DEPENDENCY_NAMES" --arg prev "$PREVIOUS_VERSION" '
+                ($names | split(",") | map(gsub("^\\s+|\\s+$"; ""))) as $deps
+                | .data.repository.vulnerabilityAlerts.nodes[]
+                | select(.securityVulnerability.package.name as $n | $deps | index($n))
+                | select((.vulnerableRequirements | ltrimstr("= ")) == $prev)
+                | "\(.securityAdvisory.ghsaId) \(.securityVulnerability.firstPatchedVersion.identifier // "") \(.securityAdvisory.severity)"')
+
+          ghsa=""
+          while read -r id patched severity; do
+              [ -z "$patched" ] && continue
+              # Skip advisories the target version does not actually fix.
+              [ "$(printf '%s\n%s\n' "$patched" "$NEW_VERSION" | sort -V | head -n1)" = "$patched" ] || continue
+              ghsa="$id"
+              echo "$id ($severity), fixed in $patched"
+              break
+          done <<<"$alerts"
+
+          echo "ghsa-id=$ghsa" >>"$GITHUB_OUTPUT"
 
       # Development dependencies: any minor or patch.
-      # Production dependencies: security fixes only, minor or patch.
-      # Anything else (major, indirect dependencies) is merged by hand.
+      # Production and indirect dependencies: security fixes only, minor or patch.
+      # Majors are merged by hand.
       #
       # Production is restricted because the composer "require" of a WordPress
       # project holds the core and the plugins, which do not follow semver, and
       # this CI only validates, lints and builds: nothing tests the site.
+      # Indirect dependencies carry almost every advisory of an npm project, so
+      # excluding them would leave the security policy with nothing to act on.
       - name: Apply auto-merge policy
         id: policy
         env:
           DEPENDENCY_TYPE: {{"${{ steps.metadata.outputs.dependency-type }}"}}
           UPDATE_TYPE: {{"${{ steps.metadata.outputs.update-type }}"}}
-          GHSA_ID: {{"${{ steps.metadata.outputs.ghsa-id }}"}}
+          GHSA_ID: {{"${{ steps.advisory.outputs.ghsa-id }}"}}
         run: |
           eligible=false
 
@@ -146,7 +184,7 @@ jobs:
                       direct:development)
                           eligible=true
                           ;;
-                      direct:production)
+                      direct:production | indirect)
                           if [ -n "$GHSA_ID" ]; then eligible=true; fi
                           ;;
                   esac
