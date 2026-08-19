@@ -1,9 +1,0 @@
-# Documentation: https://github.com/ahmadnassri/action-dependabot-auto-merge#configuration-file-syntax
-
-- match:
-      dependency_type: development
-      update_type: semver:minor # includes patch updates!
-
-- match:
-      dependency_type: production
-      update_type: semver:minor # includes patch updates!
