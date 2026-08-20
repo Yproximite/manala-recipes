@@ -21,6 +21,12 @@ system:
         version: {{ .php.version | toYaml }}
         extensions: {{ .php.extensions | toYaml }}
 
+    {{- if .node.version }}
+    node:
+        version: {{ .node.version | toYaml }}
+        extensions: {{ .node.extensions | toYaml }}
+    {{- end }}
+
     run:
         postdeploy: {{ .run.postdeploy | toYaml }}
 
