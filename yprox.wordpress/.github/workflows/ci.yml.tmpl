@@ -1,5 +1,9 @@
 name: CI
 
+# The push and pull_request filters differ on purpose, do not align them.
+# Workflow files never ship in the image, so push keeps ignoring them. On
+# pull_request they still need the checks to run, otherwise such a pull request
+# cannot be validated. Only ci.yml is opted back in.
 on:
   push:
     branches:
@@ -7,8 +11,10 @@ on:
     paths-ignore:
       - ".github/**"
   pull_request:
-    paths-ignore:
-      - ".github/**"
+    paths:
+      - "**"
+      - "!.github/**"
+      - ".github/workflows/ci.yml"
     types:
       - opened
       - reopened
@@ -32,7 +38,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Check composer.json existence
         run: echo "composer_exist=$(test -f composer.json && echo 'true' || echo 'false')" >> $GITHUB_ENV
@@ -50,14 +56,14 @@ jobs:
       - run: composer validate
         if: env.composer_exist == 'true'
 
-      - uses: actions/cache@v4
+      - uses: actions/cache@v6
         with:
           path: {{"${{ env.COMPOSER_CACHE_DIR }}"}}
           key: {{"${{ runner.os }}"}}-composer-{{"${{ hashFiles('**/composer.lock') }}"}}
           restore-keys: {{"${{ runner.os }}"}}-composer-
         if: env.composer_exist == 'true'
 
-      - uses: ramsey/composer-install@v3
+      - uses: ramsey/composer-install@v4
         with:
           composer-options: "--prefer-dist --optimize-autoloader"
         if: env.composer_exist == 'true'
@@ -69,13 +75,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Check package.json existence
         run: echo "package_exist=$(test -f package.json && echo 'true' || echo 'false')" >> $GITHUB_ENV
 
       - name: Install Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: {{"${{ env.NODE_VERSION }}"}}
           cache: 'yarn'
@@ -96,7 +102,7 @@ jobs:
     if: {{"${{ github.actor == 'yprox' && contains(github.event.pull_request.labels.*.name, 'bifrost:composer_operation') }}"}}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Merge pull requests
         uses: pascalgn/automerge-action@v0.16.4
