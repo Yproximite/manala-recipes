@@ -1,322 +1,202 @@
 # yProx - WordPress (Docker)
 
-A [Manala recipe](https://github.com/manala/manala-recipes) for Wordpress projects.
+A [Manala](https://manala.github.io/manala/) recipe for yProximité WordPress projects.
+
+It provides:
+
+* a Docker Compose environment for local development (web, MySQL, optional Redis),
+* the `Dockerfile` used both locally and to build the deployed production image,
+* the GitHub Actions workflows: CI, CD, Composer operations and Manala synchronization.
+
+The generated `.env.example` follows the [Bedrock](https://roots.io/bedrock/) layout
+(`web/app`, `WP_HOME` / `WP_SITEURL`, roots.io salts).
 
 ---
 
 ## Requirements
 
 * [manala](https://manala.github.io/manala/)
-* [Docker Desktop 2.2.0+](https://docs.docker.com/engine/install/), with [Docker Compose](https://docs.docker.com/compose/install/) **or** [Docker Compose v2 plugin](https://docs.docker.com/compose/cli-command/#install-on-linux)
-* [Ycli](https://github.com/Yproximite/ycli) must be installed by yourself on your machine
+* [Docker](https://docs.docker.com/engine/install/) with the [Compose plugin](https://docs.docker.com/compose/install/)
+* [Ycli](https://github.com/Yproximite/ycli), which provides the `wordpress-network` network and the
+  reverse proxy serving `*.wordpress.vm` hostnames
+* Access to the yProximité Scaleway registry, where the `wordpress-base` image is pulled from
+* A `~/.composer/auth.json` file: Compose mounts it read-only into the web container
 
 ## Init
 
-```
-$ cd [workspace]
-$ manala init -i yprox.wordpress --repository https://github.com/Yproximite/manala-recipes.git [project]
-```
-
-## Quick start
-
-In a shell terminal, change directory to your app, and run the following commands:
-
 ```shell
-cd /path/to/my/app
-manala init --repository https://github.com/Yproximite/manala-recipes.git
-Select the "yprox.wordpress" recipe
+cd [workspace]
+manala init -i yprox.wordpress --repository https://github.com/Yproximite/manala-recipes.git [project]
 ```
 
-Edit the `Makefile` at the root directory of your project and add the following lines at the beginning of the file:
+On an existing project, run `manala init` in its directory and pick the `yprox.wordpress` recipe.
 
-```makefile
--include .manala/Makefile
-
-# This function will be called at the end of "make setup"
-define setup
-	# For example:
-	# $(MAKE) install-app
-	# $(MAKE) init-db@test
-endef
-
-# This function will be called at the end of "make setup@integration"
-define setup_integration
-	# For example:
-	# $(MAKE) install-app@integration
-endef
-```
-
-Then update the `.manala.yaml` file (see [the releases example](#releases) below) and then run the `manala up` command:
+Then edit `.manala.yaml` and apply your changes:
 
 ```shell
 manala up
 ```
 
-**Don't forget to run the `manala up` command each time you update the `.manala.yaml` file to actually apply your changes**
+**Run `manala up` every time you edit `.manala.yaml`, otherwise nothing is regenerated.**
+`manala watch` keeps the project in sync while you work on the manifest.
 
-From now on, if you execute the `make help` command in your console, you should obtain the following output:
+## Configuration
 
-```shell
-Usage: make [target] 	
+Everything lives under the `system` key of `.manala.yaml`:
 
-Help:   
-  help This help 	
+| Key | Accepted values | Effect |
+| --- | --- | --- |
+| `app_name` | kebab-case string, **required** | container names, `<app_name>.wordpress.vm` hostname, database name / user, S3 bucket, CD project |
+| `timezone` | `Region/City`, defaults to `Etc/UTC` | `TZ` of the database and Redis containers |
+| `php.version` | `7.4`, `8.2`, `8.4` | `wordpress-base` image tag, `PHP_VERSION` in CI |
+| `node.version` | `"18"`, `"20"`, `"22"`, `"24"` | `NODE_VERSION` build argument (installed through nvm), `NODE_VERSION` in CI |
+| `redis.version` | `~` or `'*'` | adds the Redis service to `docker-compose.yaml` |
+| `run.postdeploy` | string or `~` | adds a `postdeploy` entry to the `Procfile` |
 
-Environment:   
-  setup              Setup the development environment   
-  setup@integration  Setup the integration environment   
-  up                 Start the development environment   
-  halt               Stop the development environment   
-  destroy            Destroy the development environment 	
-
-Project:
-  install-app:             Install application
-  install-app@integration: Install application in integration environment
-```
-
-## Docker interaction
-
-Initialise Docker Compose containers and your app:
-```bash
-make setup
-```
-
-Start Docker Compose containers:
-```bash
-make up
-```
-
-Stop Docker Compose containers:
-```bash
-make halt
-```
-
-Stop and remove Docker Compose containers:
-```shell
-make destroy
-```
-
-## System
-
-Here is an example of a system configuration in `.manala.yaml`:
+A typical manifest:
 
 ```yaml
-##########
-# System #
-##########
+manala:
+    recipe: yprox.wordpress
+    repository: https://github.com/Yproximite/manala-recipes.git
 
 system:
     app_name: your-app
-    postgresql:
-        version: 12
+    timezone: Europe/Paris
+
+    php:
+        version: 8.4
+
+    node:
+        version: "22"
+
     redis:
         version: '*'
+
+    run:
+        postdeploy: ~
 ```
 
-## Integration
+### Node version
 
-### GitHub Actions
+Major versions are enough: `nvm` and `actions/setup-node` both resolve `22` to the latest 22.x. The
+exact versions previously exposed by the recipe (`10.24.1`, `18.20.8`, `20.20.0`, `22.23.2`) are still
+accepted, so existing projects keep synchronizing.
 
-Since this recipe generates a `docker-compose.yaml` file, it can be used to provide a fully-fledged environnement according to your project needs on GitHub Actions.
-
-```yaml
-name: CI
-
-on:
-    pull_request:
-        types: [opened, synchronize, reopened, ready_for_review]
-
-env:
-    TZ: UTC
-
-jobs:
-    php:
-        runs-on: ubuntu-latest
-        steps:
-            - uses: actions/checkout@v2
-            
-            # The code of this local action can be found below
-            - uses: ./.github/actions/setup-environment
-
-            - uses: shivammathur/setup-php@v2
-              with:
-                  php-version: ${{ env.PHP_VERSION }} # PHP_VERSION comes from setup-environment local action
-                  coverage: none
-                  extensions: iconv, intl
-                  ini-values: date.timezone=${{ env.TZ }}
-                  tools: symfony
-
-            - uses: actions/setup-node@v2
-              with:
-                  node-version: ${{ env.NODE_VERSION }} # NODE_VERSION comes from setup-environment local action
-
-            - uses: actions/cache@v2
-              with:
-                  path: ${{ env.COMPOSER_CACHE_DIR }}
-                  key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
-                  restore-keys: ${{ runner.os }}-composer-
-
-            - uses: actions/cache@v2
-              with:
-                  path: ${{ env.YARN_CACHE_DIR }}
-                  key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-                  restore-keys: ${{ runner.os }}-yarn-
-
-            # Will setup the Symfony CLI and build Docker Compose containers
-            # No need to create DATABASE_URL or REDIS_URL environment variables, they will be
-            # automatically injected to PHP/Symfony thanks to the Symfony CLI's Docker Integration
-            - run: make setup@integration
-
-            # Check versions
-            - run: symfony php -v # PHP 8.0.3
-            - run: node -v # Node.js 14.16.0
-
-            # Run some tests... remember to use "symfony php" and not "php"
-            - run: symfony console cache:clear
-            - run: symfony console lint:twig templates
-            - run: symfony console lint:yaml config --parse-tags
-            - run: symfony console lint:xliff translations
+**Keep the quotes.** `version: "22"` is a string, `version: 22` is a YAML integer and gets rejected:
 
 ```
-
-This is the code of local action `setup-environment`:
-```yaml
-# .github/actions/setup-environment/action.yml
-name: Setup environment
-description: Setup environment
-runs:
-    using: 'composite'
-    steps:
-        - run: echo "PHP_VERSION=$(cat .php-version | xargs)" >> $GITHUB_ENV
-          shell: bash
-
-        - run: echo "NODE_VERSION=$(cat .nvmrc | xargs)" >> $GITHUB_ENV
-          shell: bash
-
-        # Composer cache
-        - id: composer-cache
-          run: echo "::set-output name=dir::$(composer global config cache-files-dir)"
-          shell: bash
-
-        - run: echo "COMPOSER_CACHE_DIR=${{ steps.composer-cache.outputs.dir }}" >> $GITHUB_ENV
-          shell: bash
-
-        # Yarn cache
-        - id: yarn-cache-dir
-          run: echo "::set-output name=dir::$(yarn cache dir)"
-          shell: bash
-
-        - run: echo "YARN_CACHE_DIR=${{ steps.yarn-cache-dir.outputs.dir }}" >> $GITHUB_ENV
-          shell: bash
+⨯ invalid type  expected=string given=integer
 ```
 
-### Common integration tasks
+Two consequences of resolving a major at build time are worth knowing: two builds a few weeks apart
+may not embed the same Node patch release, and the version must be one the `wordpress-base` image can
+actually run.
 
-Add in your `Makefile`:
+### Keys with no effect
 
-```makefile
-# ...
+`php.extensions`, `node.extensions` and `redis.config` are accepted by the schema but no template
+consumes them — filling them changes nothing. `node.version` cannot be set to `~` either, despite
+`null` appearing in its enum.
 
-# This function will be called during "make setup"
-define setup
-    $(MAKE) install-app
-    $(MAKE) init-db@test
-endef
+## Generated files
 
-# This function will be called during "make setup@integration"
-define setup_integration
-    $(MAKE) install-app@integration
-endef
+`manala up` overwrites all of these; edit them in the recipe, never in the project.
 
-###########
-# Install #
-###########
+| Path | Contents |
+| --- | --- |
+| `.docker/Dockerfile` | `base` → `development` → `builder` → `production` stages |
+| `.docker/nginx.d/`, `.docker/fpm.d/`, `.docker/php.d/` | configuration snippets copied into the image |
+| `docker-compose.yaml` | web, database and — when Redis is enabled — the Redis service |
+| `Procfile` | processes run by the image: `nginx`, `php-fpm`, plus `postdeploy` |
+| `.env.example` | template for the `.env` of the project |
+| `.dockerignore` | build context exclusions |
+| `.github/workflows/ci.yml`, `cd.yml`, `composer_operations.yml`, `manala_sync.yml` | see below |
 
-## Install application
-install-app: composer-install init-db
-install-app:
-	$(symfony) console cache:clear
-	yarn install
-	yarn dev
+`.docker/nginx.d/wordpress.conf` and `.docker/fpm.d/wordpress.conf` are shipped empty: they exist as
+placeholders, and anything a project writes there is wiped on the next `manala up`.
 
-## Install application in integration environment
-install-app@integration: export APP_ENV=test
-install-app@integration:
-	$(composer) install --ansi --no-interaction --no-progress --prefer-dist --optimize-autoloader
-	yarn install --color=always --no-progress --frozen-lockfile
-	yarn dev
-	$(MAKE) init-db@integration
+`.github/dependabot.yml` sits in the recipe as a reference but is **not** part of the synchronized
+files — copy it by hand into a project that needs it.
 
-################
-# Common tasks #
-################
+## Local environment
 
-composer-install:
-	$(composer) install --ansi --no-interaction
+Create the `.env` file from the generated template, then fill in the salts
+([roots.io/salts.html](https://roots.io/salts.html)), `MCLOUD_STORAGE_S3_SECRET` and, if the project
+uses it, `WPMDB_LICENCE`:
 
-init-db:
-	$(symfony) console doctrine:database:drop --force --if-exists --no-interaction
-	$(symfony) console doctrine:database:create --no-interaction
-	$(symfony) console doctrine:schema:update --force --no-interaction # to remove when we will use migrations
-	# $(symfony) console doctrine:migrations:migrate --no-interaction
-	$(symfony) console hautelook:fixtures:load --no-interaction
-
-init-db@test: export APP_ENV=test
-init-db@test: init-db
-
-init-db@integration: export APP_ENV=test
-init-db@integration:
-	$(symfony) console doctrine:database:create --if-not-exists --no-interaction
-	$(symfony) console doctrine:schema:update --force --no-interaction # to remove when we will use migrations
-	# $(symfony) console doctrine:migrations:migrate --no-interaction
-	$(symfony) console hautelook:fixtures:load --no-interaction
-
-reload-db@test: export APP_ENV=test
-reload-db@test:
-	$(symfony) console hautelook:fixtures:load --purge-with-truncate --no-interaction
+```shell
+cp .env.example .env
 ```
 
-### ElasticSearch usage
+Build and start the containers:
 
-#### System configuration
-> __ElasticSearch require some configuration in order start.__ 
-
-You have to increase the `vm.max_map_count` up to `262144` either by running : `sysctl -w vm.max_map_count=262144` or by updating `/etc/sysctl.conf`.
-Setting value with `sysctl` command will not persist after a reboot.
-
-#### Plugins
-You can install any plugin you need by providing them in the `plugins` field.
-```yaml
-# .manala.yml
-
-system:
-  app_name: your-app
-  
-  elascticsearch:
-    version: 6.22.8
-    plugins:
-      - a-plugin
-      - b-plugin 
+```shell
+docker compose up -d --build
 ```
-> Since all elasticsearch data are stored in a persistent volume, if you remove a plugin from this list and just re-run a `make up` the plugin will not be removed.
-> In order to do so, you have to delete the volume (the hard way) or manually remove the plugin in the container itself with `./bin/elasticsearch-plugin remove <plugin>`
 
-### Tools
+The site is served at `http://<app_name>.wordpress.vm` through the Ycli proxy. Container ports are
+published on random host ports; retrieve them when you need a direct access:
 
-#### Admin UI for database
+```shell
+docker compose port wordpress-<app_name>-web 8080
+docker compose port wordpress-<app_name>-database 3306
+```
 
-- If you use PostgreSQL, run `make run-phppgadmin` to run a local [PhpPgAdmin](https://github.com/phppgadmin/phppgadmin) instance
-- If using MariaDB, run `make run-phpmyadmin` to run a local [PhpMyAdmin](https://github.com/phpmyadmin/phpmyadmin) instance
+Useful details:
 
-#### Admin UI for Redis
+* the project directory is bind-mounted on `/var/www/html`, so Composer and Yarn can be run straight
+  from the web container,
+* the `development` stage installs Node through nvm: source it before using `yarn`
+  (`. "$NVM_DIR/nvm.sh"`),
+* OPcache is disabled locally (`PHP_INI_OPCACHE_ENABLE: 0`) and enabled in the production image,
+* database credentials all default to `app_name`, on a `mysql:5.7` server whose data lives in a named
+  volume,
+* the Redis service uses `redis/redis-stack`, which also exposes its RedisInsight UI on port `8001`.
 
-Run `make run-phpredisadmin` to run a local [PhpRedisAdmin](https://github.com/erikdubbelboer/phpRedisAdmin) instance.
+## GitHub Actions
 
-#### Admin UI for Mongo
+### CI
 
-You can use `Compass` a GUI for MongoDB, install it from here : [Compass](https://www.mongodb.com/try/download/compass).
-Once installed, retrieve Mongo Docker exposed port with `docker ps --filter "name=mongo"` and use this port in the connection string.
+Runs on pull requests and on pushes to `master`. Two independent jobs, each one skipped when the file
+it needs is absent:
 
-#### Kibana for ElasticSearch
+* **php** — needs `composer.json`: `composer validate`, then `php-cs-fixer` in dry-run mode, so
+  `friendsofphp/php-cs-fixer` must be a dev dependency of the project.
+* **javascript** — needs `package.json`: `yarn install`, `yarn lint`, `yarn build`, so both scripts
+  must exist and a `yarn.lock` must be committed.
 
-Run `make run-kibana` to run a local [Kibana](https://github.com/elastic/kibana) instance.
+Two auto-merge jobs then run once both are green:
+
+* pull requests labelled `bifrost:composer_operation` opened by the `yprox` account,
+* Dependabot pull requests, under this policy: development dependencies on any minor or patch,
+  production and indirect dependencies only when the bump actually fixes an open security advisory,
+  majors always by hand.
+
+### CD
+
+Triggered by a successful CI run on `master`, or manually. It delegates to
+`Yproximite/actions/.github/workflows/wordpress_build.yml`, which builds the `production` stage and
+rolls it out. Automatic deployment only happens when the repository variable `AUTODEPLOY` is set to
+`true`; `workflow_dispatch` always deploys.
+
+### Composer operations
+
+Manual (or dispatched) `composer update` / `require` / `remove` on `master`, opening a pull request
+that the auto-merge job above can pick up.
+
+### Manala sync
+
+Re-runs `manala up` on the project and opens a pull request with the result. Dispatched by this
+repository when a recipe changes, or triggered by hand.
+
+### Secrets and variables
+
+| Name | Used by |
+| --- | --- |
+| `COMPOSER_AUTH` | CI, CD, Composer operations — private Packagist access |
+| `GH_MANALA_SYNC_TOKEN` | Composer-operation auto-merge, Composer operations, Manala sync |
+| `ACTION_DEPENDABOT_AUTO_MERGE_TOKEN` | Dependabot auto-merge — a PAT is required, the workflow token cannot approve a pull request |
+| `SCW_CONTAINER_REGISTRY_TOKEN` | CD — pushing the image |
+| `GH_ROLLOUT_TOKEN` | CD — triggering the rollout |
+| `AUTODEPLOY` (variable) | CD — enables automatic deployment |
