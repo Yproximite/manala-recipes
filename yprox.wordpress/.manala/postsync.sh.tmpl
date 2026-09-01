@@ -1,0 +1,52 @@
+#!/usr/bin/env bash
+
+# Realigns on .manala.yaml the files manala cannot overwrite, because the
+# project owns part of their contents too. Run by the Manala Synchronize
+# workflow right after "manala up", and by "make manala" locally.
+#
+# Compatible with bash 3.2, the version macOS ships.
+
+set -euo pipefail
+
+php_version="{{ .Vars.system.php.version }}"
+node_version="{{ .Vars.system.node.version | default "" }}"
+
+# The schema declares php.version as a number, so "8.0" renders as "8".
+[[ "${php_version}" == *.* ]] || php_version="${php_version}.0"
+
+require_command() {
+    command -v "${1}" > /dev/null || {
+        echo "postsync: ${1} is required (macOS: brew install ${1})" >&2
+        exit 1
+    }
+}
+
+if [[ -f composer.json ]]; then
+    require_command composer
+
+    checksum="$(cksum < composer.json)"
+
+    # JsonManipulator edits the JSON in place: neither the formatting nor the
+    # package order moves, unlike a rewrite through jq.
+    composer require --no-update --no-scripts --no-interaction --quiet "php:^${php_version}"
+
+    # Changing a constraint invalidates the lock content-hash. Refreshing it
+    # needs a full resolution, which fails on the projects pinning package
+    # versions the repositories no longer serve. Best effort then: an outdated
+    # hash only makes "composer install" warn, it still installs.
+    # --ignore-platform-reqs because the runner PHP is not the project one.
+    if [[ "$(cksum < composer.json)" != "${checksum}" && -f composer.lock ]]; then
+        composer update --lock --no-scripts --no-install --no-interaction \
+            --ignore-platform-reqs --quiet \
+            || echo "postsync: composer.lock left outdated, refresh it with a real composer update" >&2
+    fi
+fi
+
+if [[ -n "${node_version}" && -f package.json ]]; then
+    require_command jq
+
+    trap 'rm -f package.json.postsync' EXIT
+
+    jq --indent 2 ".engines.node = \"${node_version%%.*}.x\"" package.json > package.json.postsync
+    mv package.json.postsync package.json
+fi
