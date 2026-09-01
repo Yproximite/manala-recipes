@@ -13,6 +13,8 @@ manala:
         - Procfile.tmpl
         - .env.example.tmpl
         - Makefile.dist
+        - .php-version.tmpl
+        - .nvmrc.tmpl
 
 system:
     # @option {"label": "App name (in kebab-case)"}

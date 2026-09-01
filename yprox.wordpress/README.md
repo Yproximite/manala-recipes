@@ -111,6 +111,8 @@ consumes them — filling them changes nothing. `node.version` cannot be set to 
 | `Procfile` | processes run by the image: `nginx`, `php-fpm`, plus `postdeploy` |
 | `.env.example` | template for the `.env` of the project |
 | `.dockerignore` | build context exclusions |
+| `.php-version` | the PHP version, for the local toolchain (phpenv, asdf) |
+| `.nvmrc` | the Node major version, for `nvm use` |
 | `.github/workflows/ci.yml`, `cd.yml`, `composer_operations.yml`, `manala_sync.yml` | see below |
 | `.manala/Makefile` | the `manala` target |
 | `.manala/postsync.sh` | see [Synchronization](#synchronization) |
