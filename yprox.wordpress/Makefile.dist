@@ -1,0 +1,6 @@
+.SILENT:
+
+-include .manala/Makefile
+
+# Project targets go below. Manala creates this file when it is missing, and
+# never overwrites it afterwards.

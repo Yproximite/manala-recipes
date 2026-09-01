@@ -2,6 +2,7 @@ manala:
     description: yProximite - WordPress projects using Docker
     template: .manala.yaml.tmpl
     sync:
+        - .manala/
         - .docker/
         - .github/workflows/ci.yml.tmpl
         - .github/workflows/cd.yml.tmpl
@@ -11,6 +12,7 @@ manala:
         - docker-compose.yaml.tmpl
         - Procfile.tmpl
         - .env.example.tmpl
+        - Makefile.dist
 
 system:
     # @option {"label": "App name (in kebab-case)"}

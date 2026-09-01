@@ -112,12 +112,38 @@ consumes them — filling them changes nothing. `node.version` cannot be set to 
 | `.env.example` | template for the `.env` of the project |
 | `.dockerignore` | build context exclusions |
 | `.github/workflows/ci.yml`, `cd.yml`, `composer_operations.yml`, `manala_sync.yml` | see below |
+| `.manala/Makefile` | the `manala` target |
+| `.manala/postsync.sh` | see [Synchronization](#synchronization) |
 
 `.docker/nginx.d/wordpress.conf` and `.docker/fpm.d/wordpress.conf` are shipped empty: they exist as
 placeholders, and anything a project writes there is wiped on the next `manala up`.
 
 `.github/dependabot.yml` sits in the recipe as a reference but is **not** part of the synchronized
 files — copy it by hand into a project that needs it.
+
+The root `Makefile` is the exception: manala creates it from `Makefile.dist` when it is missing, then
+leaves it alone. It only includes `.manala/Makefile`, so project targets can be added to it safely.
+
+## Synchronization
+
+```shell
+make manala
+```
+
+`manala up` alone is not enough. It can only write whole files, so it never touches `composer.json`
+and `package.json`, whose contents the project also owns. `.manala/postsync.sh` covers that gap: it
+realigns `require.php` and `engines.node` on the versions declared in `.manala.yaml`, then tries to
+refresh the `composer.lock` content-hash.
+
+That refresh is best effort. It needs a full dependency resolution, which fails on the projects
+pinning package versions the repositories no longer serve. The script then leaves the lock alone and
+warns: an outdated content-hash only makes `composer install` print a warning, it still installs.
+
+The script needs `composer` and, for a project with a `package.json`, `jq` (`brew install jq`).
+
+Run it after every `manala up`, not only when a version changes: a project declaring no `node:` block
+in its `.manala.yaml` inherits the recipe default, so a plain recipe synchronization moves its
+`Dockerfile` while leaving `engines.node` behind.
 
 ## Local environment
 
