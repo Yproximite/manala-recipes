@@ -194,6 +194,9 @@ it needs is absent:
 * **javascript** — needs `package.json`: `yarn install`, `yarn lint`, `yarn build`, so both scripts
   must exist and a `yarn.lock` must be committed.
 
+Each job reads its version from the generated `.php-version` and `.nvmrc`, so `ci.yml` holds no
+manifest value and a version change no longer rewrites it.
+
 Two auto-merge jobs then run once both are green:
 
 * pull requests labelled `bifrost:composer_operation` opened by the `yprox` account,

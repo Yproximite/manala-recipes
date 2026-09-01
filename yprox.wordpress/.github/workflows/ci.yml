@@ -23,15 +23,13 @@ on:
 
 concurrency:
   cancel-in-progress: true
-  group: ci-{{"${{ github.ref }}"}}
+  group: ci-${{ github.ref }}
 
 env:
   TZ: UTC
-  PHP_VERSION: {{ .Vars.system.php.version }}
-  NODE_VERSION: {{ .Vars.system.node.version }}
   COMPOSER_CACHE_DIR: '~/.composer/cache'
   COMPOSER_ALLOW_SUPERUSER: '1' # https://getcomposer.org/doc/03-cli.md#composer-allow-superuser
-  COMPOSER_AUTH: '{{"${{ secrets.COMPOSER_AUTH }}"}}'
+  COMPOSER_AUTH: '${{ secrets.COMPOSER_AUTH }}'
 
 jobs:
   php:
@@ -46,10 +44,10 @@ jobs:
       - name: Install PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: {{"${{ env.PHP_VERSION }}"}}
+          php-version-file: .php-version
           coverage: none
           extensions: ctype, iconv, intl
-          ini-values: date.timezone={{"${{ env.TZ }}"}}, memory_limit=-1, session.gc_probability=0, opcache.enable=1, opcache.enable_cli=1, opcache.memory_consumption=256, opcache.max_accelerated_files=20000, opcache.validate_timestamps=0, realpath_cache_size=4096K, realpath_cache_ttl=600
+          ini-values: date.timezone=${{ env.TZ }}, memory_limit=-1, session.gc_probability=0, opcache.enable=1, opcache.enable_cli=1, opcache.memory_consumption=256, opcache.max_accelerated_files=20000, opcache.validate_timestamps=0, realpath_cache_size=4096K, realpath_cache_ttl=600
           tools: composer:v2, cs2pr
         if: env.composer_exist == 'true'
 
@@ -58,9 +56,9 @@ jobs:
 
       - uses: actions/cache@v6
         with:
-          path: {{"${{ env.COMPOSER_CACHE_DIR }}"}}
-          key: {{"${{ runner.os }}"}}-composer-{{"${{ hashFiles('**/composer.lock') }}"}}
-          restore-keys: {{"${{ runner.os }}"}}-composer-
+          path: ${{ env.COMPOSER_CACHE_DIR }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: ${{ runner.os }}-composer-
         if: env.composer_exist == 'true'
 
       - uses: ramsey/composer-install@v4
@@ -83,7 +81,7 @@ jobs:
       - name: Install Node.js
         uses: actions/setup-node@v7
         with:
-          node-version: {{"${{ env.NODE_VERSION }}"}}
+          node-version-file: .nvmrc
           cache: 'yarn'
         if: env.package_exist == 'true'
 
@@ -99,7 +97,7 @@ jobs:
   auto_merge_composer_operation:
     runs-on: ubuntu-latest
     needs: [ php, javascript ]
-    if: {{"${{ github.actor == 'yprox' && contains(github.event.pull_request.labels.*.name, 'bifrost:composer_operation') }}"}}
+    if: ${{ github.actor == 'yprox' && contains(github.event.pull_request.labels.*.name, 'bifrost:composer_operation') }}
     steps:
       - name: Checkout
         uses: actions/checkout@v7
@@ -107,7 +105,7 @@ jobs:
       - name: Merge pull requests
         uses: pascalgn/automerge-action@v0.16.4
         env:
-          GITHUB_TOKEN: '{{"${{ secrets.GH_MANALA_SYNC_TOKEN }}"}}'
+          GITHUB_TOKEN: '${{ secrets.GH_MANALA_SYNC_TOKEN }}'
           MERGE_LABELS: "bifrost:composer_operation"
           MERGE_DELETE_BRANCH: "true"
           MERGE_ERROR_FAIL: "true"
@@ -116,7 +114,7 @@ jobs:
   auto_merge_dependabot:
     runs-on: ubuntu-latest
     needs: [php, javascript]
-    if: {{"${{ github.actor == 'dependabot[bot]' }}"}}
+    if: ${{ github.actor == 'dependabot[bot]' }}
     permissions:
       contents: write
       pull-requests: write
@@ -133,10 +131,10 @@ jobs:
       - name: Look up security advisories
         id: advisory
         env:
-          GH_TOKEN: {{"${{ secrets.ACTION_DEPENDABOT_AUTO_MERGE_TOKEN }}"}}
-          DEPENDENCY_NAMES: {{"${{ steps.metadata.outputs.dependency-names }}"}}
-          PREVIOUS_VERSION: {{"${{ steps.metadata.outputs.previous-version }}"}}
-          NEW_VERSION: {{"${{ steps.metadata.outputs.new-version }}"}}
+          GH_TOKEN: ${{ secrets.ACTION_DEPENDABOT_AUTO_MERGE_TOKEN }}
+          DEPENDENCY_NAMES: ${{ steps.metadata.outputs.dependency-names }}
+          PREVIOUS_VERSION: ${{ steps.metadata.outputs.previous-version }}
+          NEW_VERSION: ${{ steps.metadata.outputs.new-version }}
         run: |
           alerts=$(gh api graphql \
               -F owner="${GITHUB_REPOSITORY%/*}" -F name="${GITHUB_REPOSITORY#*/}" \
@@ -178,9 +176,9 @@ jobs:
       - name: Apply auto-merge policy
         id: policy
         env:
-          DEPENDENCY_TYPE: {{"${{ steps.metadata.outputs.dependency-type }}"}}
-          UPDATE_TYPE: {{"${{ steps.metadata.outputs.update-type }}"}}
-          GHSA_ID: {{"${{ steps.advisory.outputs.ghsa-id }}"}}
+          DEPENDENCY_TYPE: ${{ steps.metadata.outputs.dependency-type }}
+          UPDATE_TYPE: ${{ steps.metadata.outputs.update-type }}
+          GHSA_ID: ${{ steps.advisory.outputs.ghsa-id }}
         run: |
           eligible=false
 
@@ -203,10 +201,10 @@ jobs:
       # The PAT is required to approve: the Actions GITHUB_TOKEN is not
       # allowed to approve a pull request.
       - name: Approve and enable auto-merge
-        if: {{"${{ steps.policy.outputs.eligible == 'true' }}"}}
+        if: ${{ steps.policy.outputs.eligible == 'true' }}
         env:
-          GH_TOKEN: {{"${{ secrets.ACTION_DEPENDABOT_AUTO_MERGE_TOKEN }}"}}
-          PR_URL: {{"${{ github.event.pull_request.html_url }}"}}
+          GH_TOKEN: ${{ secrets.ACTION_DEPENDABOT_AUTO_MERGE_TOKEN }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
         run: |
           gh pr review --approve "$PR_URL"
           gh pr merge --auto --squash "$PR_URL"
