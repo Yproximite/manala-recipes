@@ -9,7 +9,7 @@
 {{- $has_mailpit := .Vars.system.mailpit.version -}}
 {{- $has_mongo := .Vars.system.mongo.version -}}
 {{- $has_elastic := .Vars.system.elasticsearch.version -}}
-{{- $has_minio := .Vars.system.minio.version -}}
+{{- $has_s3 := .Vars.system.s3.version -}}
 
 {{- if or ($has_postgresql) ($has_mariadb) ($has_mysql) ($has_redis) ($has_mongo) ($has_elastic) }}
 
@@ -29,8 +29,8 @@ volumes:
     {{- if $has_elastic }}
     elastic-data:
     {{- end }}
-    {{- if $has_minio }}
-    minio-data:
+    {{- if $has_s3 }}
+    s3-data:
     {{- end }}
 {{- end }}
 
@@ -218,41 +218,30 @@ services:
 
 {{- end }}
 
-{{- if $has_minio }}
-{{- $minio := .Vars.system.minio }}
+{{- if $has_s3 }}
+{{- $s3 := .Vars.system.s3 }}
 
-  minio:
-    image: quay.io/minio/minio
+  s3:
+    image: adobe/s3mock:5.2.2
     labels:
-      com.symfony.server.service-prefix: 'MINIO'
-    ports: ['9000', '9001']
+      com.symfony.server.service-prefix: 'S3'
+    ports: ['9090']
     environment:
-      MINIO_ROOT_USER: 'access_app'
-      MINIO_ROOT_PASSWORD: 'secret_app'
+      COM_ADOBE_TESTING_S3MOCK_STORE_INITIAL_BUCKETS: '{{ $s3.bucket_name }}'
+      # Sans racine explicite, S3Mock écrit dans un répertoire temporaire
+      # aléatoire : le volume ne retient alors rien d'un run à l'autre.
+      COM_ADOBE_TESTING_S3MOCK_STORE_ROOT: '/s3mockroot'
+      COM_ADOBE_TESTING_S3MOCK_STORE_RETAIN_FILES_ON_EXIT: 'true'
     volumes:
-      - minio-data:/data
-    command:
-      - server
-      - /data
-      - --console-address
-      - '0.0.0.0:9001'
-    healthcheck:
-      test: ['CMD', 'mc', 'ready', 'local']
-      interval: 5s
-      timeout: 5s
-      retries: 5
+      - s3-data:/s3mockroot
 
-  createbuckets:
-    image: minio/mc
-    depends_on:
-      minio:
-        condition: service_healthy
-    entrypoint: >
-      /bin/sh -c "
-      /usr/bin/mc alias set local http://minio:9000 access_app secret_app;
-      /usr/bin/mc mb local/{{ $minio.bucket_name }};
-      /usr/bin/mc anonymous set public local/{{ $minio.bucket_name }};
-      exit 0;
-      "
+  s3manager:
+    image: cloudlena/s3manager:v0.9.0
+    ports: [8080]
+    environment:
+      ENDPOINT: 's3:9090'
+      ACCESS_KEY_ID: 'access_app'
+      SECRET_ACCESS_KEY: 'secret_app'
+      USE_SSL: 'false'
 
 {{- end }}
