@@ -71,10 +71,10 @@ system:
         version: {{ .elasticsearch.version | toYaml }}
     {{- end }}
 
-    {{- if .minio.version }}
-    minio:
-        version: {{ .minio.version | toYaml }}
-        bucket_name: {{ .minio.bucket_name | toYaml }}
+    {{- if .s3.version }}
+    s3:
+        version: {{ .s3.version | toYaml }}
+        bucket_name: {{ .s3.bucket_name | toYaml }}
     {{- end }}
 
 {{- end }}

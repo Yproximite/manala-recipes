@@ -5,7 +5,7 @@
 {{- $has_mailpit := .Vars.system.mailpit.version -}}
 {{- $has_mongo := .Vars.system.mongo.version -}}
 {{- $has_elastic := .Vars.system.elasticsearch.version -}}
-{{- $has_minio := .Vars.system.minio.version -}}
+{{- $has_s3 := .Vars.system.s3.version -}}
 
 # Relative root dir ("."|".."|"../.."|…)
 _ROOT_DIR := $(patsubst ./%,%,$(patsubst %/.manala/Makefile,%,./$(filter %.manala/Makefile,$(MAKEFILE_LIST))))
@@ -71,7 +71,7 @@ _up:
 	{{- if $has_mailpit }} mailpit{{ end }}
 	{{- if $has_mongo }} mongo{{ end }}
 	{{- if $has_elastic }} elasticsearch{{ end }}
-	{{- if $has_minio }} minio createbuckets{{ end }}
+	{{- if $has_s3 }} s3{{ end }}
 
 	{{ if or ($has_postgresql) ($has_mariadb) ($has_mysql) -}}
 	@$(call message_warning, Waiting for the database to be ready...)
@@ -135,6 +135,14 @@ run-mailpit:
 	$(dc) up --detach mailpit
 	@echo
 	@$(call message_success, You can now open http://`$(dc) port mailpit 8025` to access Mailpit)
+	@echo{{- end }}
+
+{{ if $has_s3 -}}
+HELP += $(call help,run-s3manager, Start a S3Manager web interface)
+run-s3manager:
+	$(dc) up --detach s3manager
+	@echo
+	@$(call message_success, You can now open http://`$(dc) port s3manager 8080` to access S3Manager)
 	@echo{{- end }}
 
 {{ if $has_elastic -}}
