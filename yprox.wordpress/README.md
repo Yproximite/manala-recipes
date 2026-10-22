@@ -48,7 +48,7 @@ Everything lives under the `system` key of `.manala.yaml`:
 | --- | --- | --- |
 | `app_name` | kebab-case string, **required** | container names, `<app_name>.wordpress.vm` hostname, database name / user, S3 bucket, CD project |
 | `timezone` | `Region/City`, defaults to `Etc/UTC` | `TZ` of the database and Redis containers |
-| `php.version` | `7.4`, `8.2`, `8.4` | `wordpress-base` image tag, `PHP_VERSION` in CI |
+| `php.version` | `7.4`, `8.2`, `8.4`, `8.5` | `wordpress-base` image tag, `PHP_VERSION` in CI |
 | `node.version` | `"18"`, `"20"`, `"22"`, `"24"` | `NODE_VERSION` build argument (installed through nvm), `NODE_VERSION` in CI |
 | `redis.version` | `~` or `'*'` | adds the Redis service to `docker-compose.yaml` |
 | `run.postdeploy` | string or `~` | adds a `postdeploy` entry to the `Procfile` |

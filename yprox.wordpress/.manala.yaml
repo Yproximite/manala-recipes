@@ -24,7 +24,7 @@ system:
     timezone: Etc/UTC
     php:
         # @option {"label": "PHP version"}
-        # @schema {"enum": [7.4, 8.2, 8.4]}
+        # @schema {"enum": [7.4, 8.2, 8.4, 8.5]}
         version: 7.4
         # @schema {"type": ["array"]}
         extensions: []
