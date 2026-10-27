@@ -65,3 +65,7 @@ system:
         # @option {"label": "Bucket name (in kebab-case)"}
         # @schema {"type": ["string", "null"]}
         bucket_name: ~
+    gotenberg:
+        # @option {"label": "Gotenberg image tag"}
+        # @schema {"enum": [null, 8, "8", "8-chromium"]}
+        version: ~

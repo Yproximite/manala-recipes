@@ -6,6 +6,7 @@
 {{- $has_mongo := .Vars.system.mongo.version -}}
 {{- $has_elastic := .Vars.system.elasticsearch.version -}}
 {{- $has_s3 := .Vars.system.s3.version -}}
+{{- $has_gotenberg := .Vars.system.gotenberg.version -}}
 
 # Relative root dir ("."|".."|"../.."|…)
 _ROOT_DIR := $(patsubst ./%,%,$(patsubst %/.manala/Makefile,%,./$(filter %.manala/Makefile,$(MAKEFILE_LIST))))
@@ -72,6 +73,7 @@ _up:
 	{{- if $has_mongo }} mongo{{ end }}
 	{{- if $has_elastic }} elasticsearch{{ end }}
 	{{- if $has_s3 }} s3{{ end }}
+	{{- if $has_gotenberg }} gotenberg{{ end }}
 
 	{{ if or ($has_postgresql) ($has_mariadb) ($has_mysql) -}}
 	@$(call message_warning, Waiting for the database to be ready...)

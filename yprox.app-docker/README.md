@@ -336,6 +336,17 @@ Run `make run-phpredisadmin` to run a local [PhpRedisAdmin](https://github.com/e
 
 Run `make run-mailpit` to get the local [Mailpit](https://github.com/axllent/mailpit) instance.
 
+#### Gotenberg
+
+Set `system.gotenberg.version` to an image tag of [Gotenberg](https://gotenberg.dev) (`8`, or
+`8-chromium` when LibreOffice is not needed) to start an HTML-to-PDF service with `make up`.
+The Symfony CLI exposes it as `GOTENBERG_HOST` / `GOTENBERG_PORT`; its `GOTENBERG_URL` uses
+the `tcp://` scheme, so build the HTTP DSN yourself:
+
+```dotenv
+GOTENBERG_DSN=http://${GOTENBERG_HOST:-127.0.0.1}:${GOTENBERG_PORT:-3000}
+```
+
 #### Admin UI for Mongo
 
 You can use `Compass` a GUI for MongoDB, install it from here : [Compass](https://www.mongodb.com/try/download/compass).
