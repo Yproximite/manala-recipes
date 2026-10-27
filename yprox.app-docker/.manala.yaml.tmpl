@@ -77,4 +77,9 @@ system:
         bucket_name: {{ .s3.bucket_name | toYaml }}
     {{- end }}
 
+    {{- if .gotenberg.version }}
+    gotenberg:
+        version: {{ .gotenberg.version | toYaml }}
+    {{- end }}
+
 {{- end }}

@@ -10,6 +10,7 @@
 {{- $has_mongo := .Vars.system.mongo.version -}}
 {{- $has_elastic := .Vars.system.elasticsearch.version -}}
 {{- $has_s3 := .Vars.system.s3.version -}}
+{{- $has_gotenberg := .Vars.system.gotenberg.version -}}
 
 {{- if or ($has_postgresql) ($has_mariadb) ($has_mysql) ($has_redis) ($has_mongo) ($has_elastic) }}
 
@@ -243,5 +244,14 @@ services:
       ACCESS_KEY_ID: 'access_app'
       SECRET_ACCESS_KEY: 'secret_app'
       USE_SSL: 'false'
+
+{{- end }}
+
+{{- if $has_gotenberg }}
+{{- $gotenberg := .Vars.system.gotenberg }}
+
+  gotenberg:
+    image: 'gotenberg/gotenberg:{{ $gotenberg.version }}'
+    ports: [3000]
 
 {{- end }}
